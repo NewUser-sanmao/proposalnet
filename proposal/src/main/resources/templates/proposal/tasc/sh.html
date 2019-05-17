@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<input id="id" name="id" th:value="${wy.id}"  type="hidden">
+							<input id="tastate" name="tastate" th:value="${wy.tastate}"  type="hidden">
+							<div class="form-group" th:if="${wy.tanx==1}">	
+								<label class="col-sm-3 control-label">政协界次：</label>
+								<div class="col-sm-8">
+									<!-- <input id="zxjcidVal" class="form-control" type="hidden" th:value="${wy.zxjcid}" />
+									<select id="zxjcid" name="zxjcid" class="form-control">
+									</select> -->
+									<input id="zxjcid" name="zxjcid" class="form-control" type="hidden" th:value="${zxjc.id}"/>
+									<p th:text="${zxjc.zxjcmc}" style="margin: 0px; line-height: 34px;"></p>
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">提案题目：</label>
+								<div class="col-sm-8">
+									<input id="tatm" name="tatm" class="form-control" type="text" th:value="${wy.tatm}">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">建议承办单位：</label>
+								<div class="col-sm-8">
+									<input id="cbdwidVal" type="hidden" th:value="${wy.cbdwid}">
+									<select id="cbdwid" name="cbdwid" class="form-control">
+									</select>
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">提案类别：</label>
+								<div class="col-sm-8">
+									<input id="lbyblsxidVal" class="form-control" type="hidden" th:value="${wy.lbyblsxid}" />
+									<select id="lbyblsxid" name="lbyblsxid" class="form-control">
+										<!-- <option th:value="${wy.lbyblsxid}" th:text="${lbyblsxName}"></option> -->
+									</select>
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">是否经过调研：</label>
+								<div class="col-sm-3">
+									<!-- <input id="isjgdy" name="isjgdy" class="form-control" type="text"> -->
+									<label><input type="radio" name="isjgdy" value="1" th:checked="${wy.isjgdy=='1'}"/>是</label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="isjgdy" value="0" th:checked="${wy.isjgdy=='0'}"/>否</label>
+								</div>
+								<label class="col-sm-3 control-label">是否本人撰写：</label>
+								<div class="col-sm-3">
+									<!-- <input id="isbrzx" name="isbrzx" class="form-control" type="text"> -->
+									<label><input type="radio" name="isbrzx" value="1" th:checked="${wy.isbrzx=='1'}"/>是</label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="isbrzx" value="0" th:checked="${wy.isbrzx=='0'}"/>否</label>
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">是否转呈他人材料：</label>
+								<div class="col-sm-3">
+									<!-- <input id="iszctrcl" name="iszctrcl" class="form-control" type="text"> -->
+									<label><input type="radio" name="iszctrcl" value="1" th:checked="${wy.iszctrcl=='1'}"/>是</label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="iszctrcl" value="0" th:checked="${wy.iszctrcl=='0'}"/>否</label>
+								</div>
+								<label class="col-sm-3 control-label">是否公开提案内容：</label>
+								<div class="col-sm-3">
+									<!-- <input id="isgktanr" name="isgktanr" class="form-control" type="text"> -->
+									<label><input type="radio" name="isgktanr" value="1" th:checked="${wy.isgktanr=='1'}"/>是</label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="isgktanr" value="0" th:checked="${wy.isgktanr=='0'}"/>否</label>
+								</div>
+							</div>
+							<!-- <div class="form-group">	
+								<label class="col-sm-3 control-label">是否公开：</label>
+								<div class="col-sm-8">
+									<label><input type="radio" name="isgkta" value="1" th:checked="${wy.isgkta==1}"/>是</label>&nbsp;&nbsp;&nbsp;&nbsp;<label><input type="radio" name="isgkta" value="0" th:checked="${wy.isgkta==0}"/>否</label>
+								</div>
+							</div> -->
+							<div class="form-group" th:if="${wy.tanx==2}">	
+								<label class="col-sm-3 control-label">单位名称及盖章：</label>
+								<div class="col-sm-8">
+									<input id="dwmc" name="dwmc" class="form-control" type="text" th:value="${wy.dwmc}">
+								</div>
+								<label class="col-sm-1" style="width: 3%;padding: 0px;"><a href="javascript:void(0);" onclick="jtwyXs();">显示</a></label>
+							</div>
+							<div id="zbrDiv" class="form-group hidden" th:if="${wy.tanx==2}">	
+								<label class="col-sm-3 control-label">执笔人：</label>
+								<div class="col-sm-8">
+									<input id="zbr" name="zbr" class="form-control" type="text" th:value="${wy.zbr}">
+								</div>
+							</div>
+							<div id="dwfzrDiv" class="form-group hidden" th:if="${wy.tanx==2}">	
+								<label class="col-sm-3 control-label">单位负责人：</label>
+								<div class="col-sm-8">
+									<input id="dwfzr" name="dwfzr" class="form-control" type="text" th:value="${wy.dwfzr}">
+								</div>
+							</div>
+							<div id="lxrDiv" class="form-group hidden" th:if="${wy.tanx==2}">	
+								<label class="col-sm-3 control-label">联系人：</label>
+								<div class="col-sm-8">
+									<input id="lxr" name="lxr" class="form-control" type="text" th:value="${wy.lxr}">
+								</div>
+							</div>
+							<div id="dzyxDiv" class="form-group hidden" th:if="${wy.tanx==2}">	
+								<label class="col-sm-3 control-label">电子邮箱：</label>
+								<div class="col-sm-8">
+									<input id="dzyx" name="dzyx" class="form-control" type="text" th:value="${wy.dzyx}">
+								</div>
+							</div>
+							<div class="form-group" th:if="${wy.tanx==1}">	
+								<label class="col-sm-3 control-label">提案者：</label>
+								<div class="col-sm-8">
+									<input id="taz" name="taz" class="form-control" type="text" th:value="${wy.taz}">
+								</div>
+								<label class="col-sm-1" style="width: 3%;padding: 0px;"><a href="javascript:void(0);" onclick="grwyXs();">显示</a></label>
+							</div>
+							<div id="gzdwjzwDiv" class="form-group hidden" th:if="${wy.tanx==1}">	
+								<label class="col-sm-3 control-label">工作单位及职务：</label>
+								<div class="col-sm-8">
+									<input id="gzdwjzw" name="gzdwjzw" class="form-control" type="text" th:value="${wy.gzdwjzw}">
+								</div>
+							</div>
+							<div id="txdzDiv" class="form-group hidden">	
+								<label class="col-sm-3 control-label">通讯地址：</label>
+								<div class="col-sm-8">
+									<input id="txdz" name="txdz" class="form-control" type="text" th:value="${wy.txdz}">
+								</div>
+							</div>
+							<div id="ybDiv" class="form-group hidden">	
+								<label class="col-sm-3 control-label">邮编：</label>
+								<div class="col-sm-8">
+									<input id="yb" name="yb" class="form-control" type="text" th:value="${wy.yb}">
+								</div>
+							</div>
+							<div id="lxdhDiv" class="form-group hidden">	
+								<label class="col-sm-3 control-label">联系电话：</label>
+								<div class="col-sm-8">
+									<input id="lxdh" name="lxdh" class="form-control" type="text" th:value="${wy.lxdh}">
+								</div>
+							</div>
+							<div id="sswyhidDiv" class="form-group hidden" th:if="${wy.tanx==1}">	
+								<label class="col-sm-3 control-label">所属专委：</label>
+								<div class="col-sm-8">
+									<input id="sswyhidVal" class="form-control" type="hidden" th:value="${wy.sswyhid}" />
+									<select id="sswyhid" name="sswyhid" class="form-control" style="width: 100%">
+										<!-- <option th:value="${wy.sswyhid}" th:text="${sswyhName}"></option> -->
+									</select>
+								</div>
+							</div>
+							<div id="fytazDiv" class="form-group" th:if="${wy.tanx==1}">	
+								<label class="col-sm-3 control-label">附议提案者：</label>
+								<div class="col-sm-8">
+									<input id="fytaz" name="fytaz" class="form-control" type="text" th:value="${wy.fytaz}">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">提案内容：</label>
+								<div class="col-sm-8">
+								</div>
+							</div>
+							<div class="form-group">
+								<label class="col-sm-2 control-label"></label>	
+								<div class="col-sm-9" style="font-size: 18px;">
+									<input id="tanr" name="tanr" type="hidden" th:value="${wy.tanr}"/>
+									<div class="ibox-content no-padding">
+										<div id="tanr_sn"></div>
+									</div>
+								</div>
+							</div>
+							
+							<!-- <div class="form-group">	
+								<label class="col-sm-3 control-label">基本情况：</label>
+								<div class="col-sm-8">
+									<input id="jbqk" name="jbqk" type="hidden" th:value="${wy.jbqk}"/>
+									<div class="ibox-content no-padding">
+										<div id="jbqk_sn"></div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">存在问题：</label>
+								<div class="col-sm-8">
+									<input id="czwt" name="czwt" type="hidden" th:value="${wy.czwt}"/>
+									<div class="ibox-content no-padding">
+										<div id="czwt_sn"></div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">对策建议：</label>
+								<div class="col-sm-8">
+									<input id="dcjy" name="dcjy" type="hidden" th:value="${wy.dcjy}"/>
+									<div class="ibox-content no-padding">
+										<div id="dcjy_sn"></div>
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">其它说明：</label>
+								<div class="col-sm-8">
+									<input id="qtsm" name="qtsm" type="hidden" th:value="${wy.qtsm}"/>
+									<div class="ibox-content no-padding">
+										<div id="qtsm_sn"></div>
+									</div>
+								</div>
+							</div> -->
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">附件：</label>
+								<div class="col-sm-8">
+									<input id="fjmc" type="hidden" th:value="${wy.fjmc}">
+									<input id="fjdz" type="hidden" th:value="${wy.fjdz}">
+									<div class="file-loading">
+									    <input id="inputFiles" name="inputFiles" type="file" multiple>
+									</div>
+								</div>
+							</div>
+							
+							<!-- <div class="form-group">	
+								<label class="col-sm-3 control-label">是否并案：</label>
+								<div class="col-sm-8">
+									<label><input type="radio" name="isba" value="1" th:checked="${wy.isba==1}" disabled="disabled"/>是</label><label><input type="radio" name="isBa" value="0" disabled="disabled" th:checked="${wy.isba==0 || (wy.isba!=1 && wy.isba!=0)}"/>否</label>
+								</div>
+							</div> -->
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">是否立案：</label>
+								<div class="col-sm-4">
+									<label><input type="radio" name="lastate" value="1" th:checked="${wy.lastate==1 || (wy.lastate!=1 && wy.lastate!=2 && wy.lastate!=3)}"/>立案</label>
+									<label><input type="radio" name="lastate" value="2" th:checked="${wy.lastate==2}" />不立案转意见</label>
+									<label><input type="radio" name="lastate" value="3" th:checked="${wy.lastate==3}" />不立案退回</label>
+								</div>
+								<div class="col-sm-4 hidden" id="laTypeDiv">
+									<label><input type="radio" name="latype" value="1" th:checked="${wy.latype==1 || (wy.latype!=1 && wylatype!=2 && wy.latype!=3)}"/>独办</label>
+									<label><input type="radio" name="latype" value="2" th:checked="${wy.latype==2}"/>分办</label>
+									<label><input type="radio" name="latype" value="3" th:checked="${wy.latype==3}"/>会办</label>
+								</div>
+							</div>
+							
+							<div class="form-group hidden" id="talyDiv">	
+								<label class="col-sm-3 control-label">退案理由</label>
+								<div class="col-sm-8">
+									<input id="talyId" class="form-control" type="hidden" th:value="${wy.taly}">
+									<select id="taly" name="taly" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group hidden" id="cbdwDiv">	
+								<label class="col-sm-3 control-label">承办单位</label>
+								<div class="col-sm-8">
+									<input id="cbdwVal" class="form-control" type="hidden" th:value="${cbdw}" />
+									<select id="cbdw" name="cbdw" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div>
+							<div class="form-group hidden" id="fbdwDiv">	
+								<label class="col-sm-3 control-label">分办单位</label>
+								<div class="col-sm-8">
+									<input id="fbdwVal" class="form-control" type="hidden" th:value="${fbdw}" />
+									<select id="fbdw" name="fbdw" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div>
+							<div class="form-group hidden" id="xbdwDiv">	
+								<label class="col-sm-3 control-label">协办单位</label>
+								<div class="col-sm-8">
+									<input id="xbdwVal" class="form-control" type="hidden" th:value="${xbdw}" />
+									<select id="xbdw" name="xbdw" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">是否重点提案：</label>
+								<div class="col-sm-8">
+									<label><input type="radio" name="iszdta" value="1" th:checked="${wy.iszdta==1}"/>是</label>
+									<label><input type="radio" name="iszdta" value="0" th:checked="${wy.iszdta==0 || (wy.iszdta!=1 && wy.iszdta!=0)}"/>否</label>
+								</div>
+							</div>
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">是否公开：</label>
+								<div class="col-sm-8">
+									<label><input type="radio" name="isgk" value="1" th:checked="${wy.isgk==1 || (wy.isgk!=1 && wy.isgk!=0)}"/>是</label>
+									<label><input type="radio" name="isgk" value="0" th:checked="${wy.isgk==0}"/>否</label>
+								</div>
+							</div>
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">分类：</label>
+								<div class="col-sm-8">
+									<input id="flidVal" class="form-control" type="hidden" th:value="${wy.flid}" />
+									<select id="flid" name="flid" class="form-control">
+										<!-- <option th:value="${wy.flid}" th:text="${flidName}"></option> -->
+									</select>
+								</div>
+							</div>
+							
+							<!-- 终审才有 -->
+							<div class="form-group" th:if="${tastate==2}">	
+								<label class="col-sm-3 control-label">领导意见：</label>
+								<div class="col-sm-8">
+									<textarea rows="5" style="width:375px;" id="ldyj" name="ldyj" th:text="${wy.ldyj}"></textarea>
+								</div>
+							</div>
+							
+							<div class="form-group" th:if="${jydw!=null}">
+								<label class="col-sm-3 control-label" style="color: #f00;">提案改办单位：</label>
+								<div class="col-sm-8">
+									<label class="col-sm-11 control-label" style="text-align: left; color: #f00; padding-left: 0px;" th:text="${jydw}"></label>
+								</div>
+							</div>
+							
+							<div class="form-group" th:if="${ly!=null}">
+								<label class="col-sm-3 control-label" style="color: #f00;">改办理由：</label>
+								<div class="col-sm-8">
+									<label class="col-sm-11 control-label" style="text-align: left; color: #f00; padding-left: 0px;" th:text="${ly}"></label>
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<input id="submitType" type="hidden" value=""/>
+									<button type="submit" class="btn btn-primary" onclick="setSubmitType(1)">提交</button>
+									&nbsp;&nbsp;&nbsp;&nbsp;
+									<button type="submit" class="btn btn-primary" onclick="setSubmitType(2)">修改提案</button>
+									&nbsp;&nbsp;&nbsp;&nbsp;
+									<button th:if="${tastate==0}" type="submit" class="btn btn-primary" onclick="setSubmitType(3);">一键终审</button>
+								</div>
+								
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tasc/sh.js?v=2019-01-14">
+	</script>
+</body>
+</html>

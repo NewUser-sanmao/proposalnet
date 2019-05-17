@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+		
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+					
+						<div class="col-sm-8">
+							 <select id="zxjcid" class="form-control" style="width: 200px;">
+							 </select>
+						</div>
+						<div class="columns pull-right">
+							<button class="btn btn-success" onclick="reLoad()">查询</button>
+							
+							<button  class="btn btn-primary fa fa-mail-forward asasas" onclick="bltnYjtj_dow();">导出</button>
+							
+						</div>
+						
+						
+					</div>
+					
+					<input id="type" type="hidden" th:value="${type}" />
+					
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+					
+				</div>
+			</div>
+		</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tjfx/bltnyjtj.js?v=2018-01-23"></script>
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<div class="form-group">	
+								<label class="col-sm-3 control-label"></label>
+								<div class="col-sm-8">
+									<label>选择主提案</label>
+								</div>
+							</div>
+							<div class="form-group" th:each="taxx:${taxxs}">	
+								<label class="col-sm-3 control-label"></label>
+								<div class="col-sm-8">
+									<label><input type="radio" name="zta" th:value="${taxx.id}"/><span th:text="${taxx.tatm}"></span></label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="button" class="btn btn-primary" onclick="hbta();">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tasc/hbta.js">
+	</script>
+</body>
+</html>

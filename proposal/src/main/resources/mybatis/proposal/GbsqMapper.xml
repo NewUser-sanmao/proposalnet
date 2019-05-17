@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.GbsqDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.GbsqDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`taxxId`,`ly`,`type`,`latype` from proposal_gbsq where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.GbsqDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`taxxId`,`ly`,`type`,`latype` from proposal_gbsq
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxId = #{taxxid} </if>
+		  		  <if test="ly != null and ly != ''"> and ly = #{ly} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="latype != null and latype != ''"> and latype = #{latype} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_gbsq
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxId = #{taxxid} </if>
+		  		  <if test="ly != null and ly != ''"> and ly = #{ly} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="latype != null and latype != ''"> and latype = #{latype} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.GbsqDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_gbsq
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`taxxId`, 
+			`ly`, 
+			`type`,
+			`latype`,
+			`laState`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{taxxid}, 
+			#{ly}, 
+			#{type},
+			#{latype},
+			#{lastate}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.GbsqDO">
+		update proposal_gbsq 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="taxxid != null">`taxxId` = #{taxxid}, </if>
+			<if test="ly != null">`ly` = #{ly}, </if>
+			<if test="type != null">`type` = #{type},</if>
+			<if test="latype != null">`latype` = #{latype}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_gbsq where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_gbsq where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	
+	<select id="tagbList" resultType="HashMap">
+		SELECT grwy.dwmc,p1.ly,p1.id,p1.taxxId,p1.latype,p1.type,p2.laState,p2.lsh,p2.tah,d1.cbdw1,d1.fbdw1,d1.xbdw1,d2.cbdw2,d2.fbdw2,d2.xbdw2 FROM proposal_gbsq p1
+		LEFT JOIN proposal_grwy grwy ON p1.createId=grwy.userId
+		LEFT JOIN proposal_taxx p2 ON p1.taxxId=p2.id
+		LEFT JOIN (SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId else null end) cbdw1 ,
+		max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw1 ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw1
+		FROM (
+		SELECT p1.taxxId,p1.type,group_concat(p2.`name`) cbdwId FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+				GROUP BY p1.taxxId,p1.type
+		) pp1
+		GROUP BY pp1.taxxId) d1 ON d1.taxxId=p2.id
+		LEFT JOIN (SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId else null end) cbdw2 ,
+		max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw2 ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw2
+		FROM (
+		SELECT p1.taxxId,p1.type,group_concat(p2.`name`) cbdwId FROM proposal_gbsq_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		GROUP BY p1.taxxId,p1.type
+		) pp1
+		GROUP BY pp1.taxxId) d2 ON d2.taxxId=p1.id
+        <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="taxxid != null and taxxid != ''"> and p1.taxxId = #{taxxid} </if>
+		 </where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by p1.id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="tagbCount" resultType="int">
+		SELECT count(p1.id) FROM proposal_gbsq p1 
+		LEFT JOIN proposal_taxx p2 ON p1.taxxId=p2.id
+		LEFT JOIN (SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId else null end) cbdw1 ,
+		max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw1 ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw1
+		FROM (
+		SELECT p1.taxxId,p1.type,group_concat(p2.`name`) cbdwId FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+				GROUP BY p1.taxxId,p1.type
+		) pp1
+		GROUP BY pp1.taxxId) d1 ON d1.taxxId=p2.id
+		LEFT JOIN (SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId else null end) cbdw2 ,
+		max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw2 ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw2
+		FROM (
+		SELECT p1.taxxId,p1.type,group_concat(p2.`name`) cbdwId FROM proposal_gbsq_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		GROUP BY p1.taxxId,p1.type
+		) pp1
+		GROUP BY pp1.taxxId) d2 ON d2.taxxId=p1.id
+        <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="taxxid != null and taxxid != ''"> and p1.taxxId = #{taxxid} </if>
+		 </where>
+	</select>
+</mapper>

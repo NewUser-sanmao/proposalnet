@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.CbdwDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.CbdwDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`parent_id`,`name`,`order_num`,`del_flag` from proposal_cbdw where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.CbdwDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`parent_id`,`name`,`order_num`,`del_flag` from proposal_cbdw
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="parentId != null and parentId != ''"> and parent_id = #{parentId} </if>
+		  		  <if test="name != null and name != ''"> and name like #{name} </if>
+		  		  <if test="orderNum != null and orderNum != ''"> and order_num = #{orderNum} </if>
+		  		  <if test="delFlag != null and delFlag != ''"> and del_flag = #{delFlag} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by order_num asc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_cbdw
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="parentId != null and parentId != ''"> and parent_id = #{parentId} </if>
+		  		  <if test="name != null and name != ''"> and name like #{name} </if>
+		  		  <if test="orderNum != null and orderNum != ''"> and order_num = #{orderNum} </if>
+		  		  <if test="delFlag != null and delFlag != ''"> and del_flag = #{delFlag} </if>
+			 	  <if test="taxxid !=null and taxxid !=''">and taxxid = #{taxxid}</if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.CbdwDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_cbdw
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`parent_id`, 
+			`name`, 
+			`order_num`, 
+			`del_flag`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{parentId}, 
+			#{name}, 
+			#{orderNum}, 
+			#{delFlag}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.CbdwDO">
+		update proposal_cbdw 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="parentId != null">`parent_id` = #{parentId}, </if>
+			<if test="name != null">`name` = #{name}, </if>
+			<if test="orderNum != null">`order_num` = #{orderNum}, </if>
+			<if test="delFlag != null">`del_flag` = #{delFlag}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_cbdw where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_cbdw where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="listCbdw" resultType="com.bootdo.proposal.domain.GrwyDO">
+		SELECT p1.*,p3.`name` parentName,s1.username userName FROM proposal_grwy p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.dwmcId=p2.id
+		LEFT JOIN proposal_cbdw p3 ON p2.parent_id=p3.id
+		LEFT JOIN sys_user s1 ON p1.userId=s1.user_id
+        <where>  
+		  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+		  		  <if test="ssjcid != null and ssjcid != ''"> and p1.ssjcId = #{ssjcid} </if>
+		  		  <if test="ssjbid != null and ssjbid != ''"> and p1.ssjbId = #{ssjbid} </if>
+		  		  <if test="ssdpid != null and ssdpid != ''"> and p1.ssdpId = #{ssdpid} </if>
+		  		  <if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+		  		  <if test="ssdqid != null and ssdqid != ''"> and p1.ssdqId = #{ssdqid} </if>
+		  		  <if test="xm != null and xm != ''"> and p1.xm = #{xm} </if>
+		  		  <if test="xb != null and xb != ''"> and p1.xb = #{xb} </if>
+		  		  <if test="srNian != null and srNian != ''"> and p1.sr_nian = #{srNian} </if>
+		  		  <if test="srYue != null and srYue != ''"> and p1.sr_yue = #{srYue} </if>
+		  		  <if test="jstx != null and jstx != ''"> and p1.jstx = #{jstx} </if>
+		  		  <if test="dwmcZw != null and dwmcZw != ''"> and p1.dwmc_zw = #{dwmcZw} </if>
+		  		  <if test="txdz != null and txdz != ''"> and p1.txdz = #{txdz} </if>
+		  		  <if test="yb != null and yb != ''"> and p1.yb = #{yb} </if>
+		  		  <if test="bglxdh != null and bglxdh != ''"> and p1.bglxdh = #{bglxdh} </if>
+		  		  <if test="sjhm != null and sjhm != ''"> and p1.sjhm = #{sjhm} </if>
+		  		  <if test="sjlx != null and sjlx != ''"> and p1.sjlx = #{sjlx} </if>
+		  		  <if test="userid != null and userid != ''"> and p1.userId = #{userid} </if>
+		  		  <if test="fzr != null and fzr != ''"> and p1.fzr = #{fzr} </if>
+		  		  <if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+		  		  <if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+		  		  <if test="zw != null and zw != ''"> and p1.zw = #{zw} </if>
+		  		  <if test="type != null and type != ''"> and p1.type = #{type} </if>
+		  		  <if test="dwjc != null and dwjc != ''"> and p1.dwjc = #{dwjc} </if>
+		  		  <if test="cbdwId != null and cbdwId != ''"> and (p2.id = #{cbdwId} or p3.id = #{cbdwId})</if>
+		  		  <if test="name != null and name != ''"> and p2.name like #{name}</if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by p2.order_num asc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<select id="listCbdwCount" resultType="int">
+		SELECT count(*) FROM proposal_grwy p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.dwmcId=p2.id
+		LEFT JOIN proposal_cbdw p3 ON p2.parent_id=p3.id
+		LEFT JOIN sys_user s1 ON p1.userId=s1.user_id
+        <where>  
+		  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+		  		  <if test="ssjcid != null and ssjcid != ''"> and p1.ssjcId = #{ssjcid} </if>
+		  		  <if test="ssjbid != null and ssjbid != ''"> and p1.ssjbId = #{ssjbid} </if>
+		  		  <if test="ssdpid != null and ssdpid != ''"> and p1.ssdpId = #{ssdpid} </if>
+		  		  <if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+		  		  <if test="ssdqid != null and ssdqid != ''"> and p1.ssdqId = #{ssdqid} </if>
+		  		  <if test="xm != null and xm != ''"> and p1.xm = #{xm} </if>
+		  		  <if test="xb != null and xb != ''"> and p1.xb = #{xb} </if>
+		  		  <if test="srNian != null and srNian != ''"> and p1.sr_nian = #{srNian} </if>
+		  		  <if test="srYue != null and srYue != ''"> and p1.sr_yue = #{srYue} </if>
+		  		  <if test="jstx != null and jstx != ''"> and p1.jstx = #{jstx} </if>
+		  		  <if test="dwmcZw != null and dwmcZw != ''"> and p1.dwmc_zw = #{dwmcZw} </if>
+		  		  <if test="txdz != null and txdz != ''"> and p1.txdz = #{txdz} </if>
+		  		  <if test="yb != null and yb != ''"> and p1.yb = #{yb} </if>
+		  		  <if test="bglxdh != null and bglxdh != ''"> and p1.bglxdh = #{bglxdh} </if>
+		  		  <if test="sjhm != null and sjhm != ''"> and p1.sjhm = #{sjhm} </if>
+		  		  <if test="sjlx != null and sjlx != ''"> and p1.sjlx = #{sjlx} </if>
+		  		  <if test="userid != null and userid != ''"> and p1.userId = #{userid} </if>
+		  		  <if test="fzr != null and fzr != ''"> and p1.fzr = #{fzr} </if>
+		  		  <if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+		  		  <if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+		  		  <if test="zw != null and zw != ''"> and p1.zw = #{zw} </if>
+		  		  <if test="type != null and type != ''"> and p1.type = #{type} </if>
+		  		  <if test="dwjc != null and dwjc != ''"> and p1.dwjc = #{dwjc} </if>
+		  		  <if test="cbdwId != null and cbdwId != ''"> and (p2.id = #{cbdwId} or p3.id = #{cbdwId})</if>
+		  		  <if test="name != null and name != ''"> and p2.name like #{name}</if>
+		  		</where>
+	</select>
+	
+	<select id="selectAllSelectByTaxxId" resultType="HashMap">
+		SELECT p2.id,p2.`name` text FROM proposal_taxx_cbdw p1
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		LEFT JOIN proposal_grwy p3 ON p2.id=p3.dwmcId
+		WHERE p1.taxxId=#{taxxid}
+		<if test="notUserId != null and notUserId != ''"> and (p3.userId!=#{notUserId} OR p3.userId is null) </if>
+	</select>
+	
+	
+	<select id="getTreeData" resultType="com.bootdo.proposal.domain.CbdwDO">
+		SELECT pp2.*,pp1.la,pp1.ycl FROM (
+		select p1.id,COUNT(CASE WHEN p3.laState=1 THEN 1 ELSE NULL END ) as la,COUNT(CASE WHEN p3.taState=6 THEN 1 ELSE NULL END ) as ycl from proposal_cbdw p1
+		LEFT JOIN proposal_taxx_cbdw p2 ON p1.id=p2.cbdwId
+		LEFT JOIN proposal_taxx p3 ON p2.taxxId=p3.id
+		<if test="zxjcid != null and zxjcid != ''"> AND p3.zxjcId = #{zxjcid} </if>
+		GROUP BY p1.id
+		) pp1 LEFT JOIN proposal_cbdw pp2 ON pp1.id=pp2.id
+	</select>
+	
+</mapper>

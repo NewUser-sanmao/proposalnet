@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.XxDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.XxDO">
+		select * from proposal_xx where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.XxDO">
+		select * from proposal_xx
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="nr != null and nr != ''"> and nr = #{nr} </if>
+		  		  <if test="fsr != null and fsr != ''"> and fsr = #{fsr} </if>
+		  		  <if test="jsr != null and jsr != ''"> and jsr = #{jsr} </if>
+		  		  <if test="cbdwid != null and cbdwid != ''"> and cbdwId = #{cbdwid} </if>
+		  		  <if test="wyid != null and wyid != ''"> and wyId = #{wyid} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxId = #{taxxid} </if>
+		  		  <if test="br != null and br != ''"> and (fsr = #{br} or jsr = #{br}) </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_xx
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="nr != null and nr != ''"> and nr = #{nr} </if>
+		  		  <if test="fsr != null and fsr != ''"> and fsr = #{fsr} </if>
+		  		  <if test="jsr != null and jsr != ''"> and jsr = #{jsr} </if>
+		  		  <if test="cbdwid != null and cbdwid != ''"> and cbdwId = #{cbdwid} </if>
+		  		  <if test="wyid != null and wyid != ''"> and wyId = #{wyid} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxId = #{taxxid} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.XxDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_xx
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`type`, 
+			`nr`, 
+			`fsr`, 
+			`jsr`, 
+			`cbdwId`, 
+			`wyId`, 
+			`taxxId`,
+			`fjmc`,
+			`fjdz`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{type}, 
+			#{nr}, 
+			#{fsr}, 
+			#{jsr}, 
+			#{cbdwid}, 
+			#{wyid}, 
+			#{taxxid},
+			#{fjmc},
+			#{fjdz}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.XxDO">
+		update proposal_xx 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="nr != null">`nr` = #{nr}, </if>
+			<if test="fsr != null">`fsr` = #{fsr}, </if>
+			<if test="jsr != null">`jsr` = #{jsr}, </if>
+			<if test="cbdwid != null">`cbdwId` = #{cbdwid}, </if>
+			<if test="wyid != null">`wyId` = #{wyid}, </if>
+			<if test="taxxid != null">`taxxId` = #{taxxid},</if>
+			<if test="fjmc != null">`fjmc` = #{fjmc},</if>
+			<if test="fjdz != null">`fjdz` = #{fjdz}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_xx where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_xx where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id="listMap" resultType="HashMap">
+		select p1.*,p4.id taxxId,p4.tatm,p4.tah,p2.type fsrType,p2.xm fsrXm,p2.dwmc fsrDwmc,p3.type jsrType,p3.xm jsrXm,p3.dwmc jsrDwmc, 
+		(CASE p2.type WHEN 1 THEN p2.xm WHEN 2 THEN p2.dwmc WHEN 3 THEN p2.dwmc ELSE p2.xm END) fsrMc,
+		(CASE p3.type WHEN 1 THEN p3.xm WHEN 2 THEN p3.dwmc WHEN 3 THEN p3.dwmc ELSE p3.xm END) jsrMc
+		from proposal_xx p1
+		LEFT JOIN proposal_grwy p2 ON p1.fsr=p2.userId
+		LEFT JOIN proposal_grwy p3 ON p1.jsr=p3.userId
+		LEFT JOIN proposal_taxx p4 ON p1.taxxId=p4.id
+        <where>  
+		  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and p1.type = #{type} </if>
+		  		  <if test="nr != null and nr != ''"> and p1.nr = #{nr} </if>
+		  		  <if test="fsr != null and fsr != ''"> and p1.fsr = #{fsr} </if>
+		  		  <if test="jsr != null and jsr != ''"> and p1.jsr = #{jsr} </if>
+		  		  <if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+		  		  <if test="wyid != null and wyid != ''"> and p1.wyId = #{wyid} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and p1.taxxId = #{taxxid} </if>
+		  		  <if test="br != null and br != ''"> and (p1.fsr = #{br} or p1.jsr = #{br}) </if>
+		  		  <if test="keyword != null and keyword != ''"> and p4.tatm like #{keyword} </if>
+		  		  <if test="proposalId != null and proposalId != ''"> and p4.id = #{proposalId} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by p1.id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="countMap" resultType="int">
+		select count(p1.id) from proposal_xx p1
+		LEFT JOIN proposal_grwy p2 ON p1.fsr=p2.userId
+		LEFT JOIN proposal_grwy p3 ON p1.jsr=p3.userId
+		LEFT JOIN proposal_taxx p4 ON p1.taxxId=p4.id
+		 <where>  
+		  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and p1.type = #{type} </if>
+		  		  <if test="nr != null and nr != ''"> and p1.nr = #{nr} </if>
+		  		  <if test="fsr != null and fsr != ''"> and p1.fsr = #{fsr} </if>
+		  		  <if test="jsr != null and jsr != ''"> and p1.jsr = #{jsr} </if>
+		  		  <if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+		  		  <if test="wyid != null and wyid != ''"> and p1.wyId = #{wyid} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and p1.taxxId = #{taxxid} </if>
+		  		  <if test="br != null and br != ''"> and (p1.fsr = #{br} or p1.jsr = #{br}) </if>
+		  		</where>
+	</select>
+
+	<select id="findCountByName" resultType="int">
+		select count(id) from proposal_xx	x1
+		left join sys_user s1 on x1.fsr=s1.user_id
+		where s1.name=#{name} and x1.taxxid=#{taxxid}
+	</select>
+	
+</mapper>

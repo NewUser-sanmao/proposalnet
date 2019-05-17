@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+	<div class="row">
+		<div class="col-sm-12">
+			
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-left">
+							<button shiro:hasPermission="proposal:tabl:yj" type="button" class="btn  btn-primary" onclick="addFh()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>添加
+							</button>
+						</div>
+						<div class="columns pull-right">
+							<button class="btn btn-success" onclick="reLoad()">查询</button>
+						</div>
+						<!-- <div class="columns pull-right col-md-2 nopadding">
+							<input id="searchName" type="text" class="form-control"
+								placeholder="">
+						</div> -->
+					</div>
+					<input id="taxxid" name="taxxid" type="hidden" th:value="${id}"/>
+					<table id="fhTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tabl/fh.js">
+	</script>
+</body>
+</html>

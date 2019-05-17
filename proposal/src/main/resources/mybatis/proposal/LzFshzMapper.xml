@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.LzFshzDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.LzFshzDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`year`,`userId`,`personalNum`,`unionNum`,`filingNum`,`importantNum`,`perfectNum`,`leaderInstructionNum`,`additionalPoints` from proposal_lz_fshz where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.LzFshzDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`year`,`userId`,`personalNum`,`unionNum`,`filingNum`,`importantNum`,`perfectNum`,`leaderInstructionNum`,`additionalPoints` from proposal_lz_fshz
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="year != null and year != ''"> and year = #{year} </if>
+		  		  <if test="sDate != null and sDate != ''"> and year &gt;= #{sDate} </if>
+		  		  <if test="eDate != null and eDate != ''"> and year &lt;= #{eDate} </if>
+		  		  <if test="userid != null and userid != ''"> and userId = #{userid} </if>
+		  		  <if test="personalnum != null and personalnum != ''"> and personalNum = #{personalnum} </if>
+		  		  <if test="unionnum != null and unionnum != ''"> and unionNum = #{unionnum} </if>
+		  		  <if test="filingnum != null and filingnum != ''"> and filingNum = #{filingnum} </if>
+		  		  <if test="importantnum != null and importantnum != ''"> and importantNum = #{importantnum} </if>
+		  		  <if test="perfectnum != null and perfectnum != ''"> and perfectNum = #{perfectnum} </if>
+		  		  <if test="leaderinstructionnum != null and leaderinstructionnum != ''"> and leaderInstructionNum = #{leaderinstructionnum} </if>
+		  		  <if test="additionalpoints != null and additionalpoints != ''"> and additionalPoints = #{additionalpoints} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_lz_fshz
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="year != null and year != ''"> and year = #{year} </if>
+		  		  <if test="userid != null and userid != ''"> and userId = #{userid} </if>
+		  		  <if test="personalnum != null and personalnum != ''"> and personalNum = #{personalnum} </if>
+		  		  <if test="unionnum != null and unionnum != ''"> and unionNum = #{unionnum} </if>
+		  		  <if test="filingnum != null and filingnum != ''"> and filingNum = #{filingnum} </if>
+		  		  <if test="importantnum != null and importantnum != ''"> and importantNum = #{importantnum} </if>
+		  		  <if test="perfectnum != null and perfectnum != ''"> and perfectNum = #{perfectnum} </if>
+		  		  <if test="leaderinstructionnum != null and leaderinstructionnum != ''"> and leaderInstructionNum = #{leaderinstructionnum} </if>
+		  		  <if test="additionalpoints != null and additionalpoints != ''"> and additionalPoints = #{additionalpoints} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.LzFshzDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_lz_fshz
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`year`, 
+			`userId`, 
+			`personalNum`, 
+			`unionNum`, 
+			`filingNum`, 
+			`importantNum`, 
+			`perfectNum`, 
+			`leaderInstructionNum`, 
+			`additionalPoints`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{year}, 
+			#{userid}, 
+			#{personalnum}, 
+			#{unionnum}, 
+			#{filingnum}, 
+			#{importantnum}, 
+			#{perfectnum}, 
+			#{leaderinstructionnum}, 
+			#{additionalpoints}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.LzFshzDO">
+		update proposal_lz_fshz 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="year != null">`year` = #{year}, </if>
+			<if test="userid != null">`userId` = #{userid}, </if>
+			<if test="personalnum != null">`personalNum` = #{personalnum}, </if>
+			<if test="unionnum != null">`unionNum` = #{unionnum}, </if>
+			<if test="filingnum != null">`filingNum` = #{filingnum}, </if>
+			<if test="importantnum != null">`importantNum` = #{importantnum}, </if>
+			<if test="perfectnum != null">`perfectNum` = #{perfectnum}, </if>
+			<if test="leaderinstructionnum != null">`leaderInstructionNum` = #{leaderinstructionnum}, </if>
+			<if test="additionalpoints != null">`additionalPoints` = #{additionalpoints}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_lz_fshz where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_lz_fshz where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.PfbTaxxDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.PfbTaxxDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`type`,`pfbId`,`taxxId`,`fz` from proposal_pfb_taxx where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.PfbTaxxDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`type`,`pfbId`,`taxxId`,`fz` from proposal_pfb_taxx
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="pfbid != null and pfbid != ''"> and pfbId = #{pfbid} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxId = #{taxxid} </if>
+		  		  <if test="fz != null and fz != ''"> and fz = #{fz} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_pfb_taxx
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="pfbid != null and pfbid != ''"> and pfbId = #{pfbid} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxId = #{taxxid} </if>
+		  		  <if test="fz != null and fz != ''"> and fz = #{fz} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.PfbTaxxDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_pfb_taxx
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`type`, 
+			`pfbId`, 
+			`taxxId`, 
+			`fz`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{type}, 
+			#{pfbid}, 
+			#{taxxid}, 
+			#{fz}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.PfbTaxxDO">
+		update proposal_pfb_taxx 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="pfbid != null">`pfbId` = #{pfbid}, </if>
+			<if test="taxxid != null">`taxxId` = #{taxxid}, </if>
+			<if test="fz != null">`fz` = #{fz}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_pfb_taxx where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_pfb_taxx where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="listMap" resultType="HashMap">
+		SELECT p1.tah,p1.taz,p1.tatm,(SELECT SUM(fz) FROM proposal_pfb_taxx WHERE type=1 AND taxxId=p1.id) zltf FROM proposal_taxx p1 
+		WHERE 
+		p1.id in (SELECT DISTINCT p2.taxxId FROM proposal_pfb_taxx p2 WHERE p2.type = #{type})
+  		<if test="zxjcId != null and zxjcId != ''"> and p1.zxjcId = #{zxjcId} </if>
+  		
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by zltf desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="listMapCount" resultType="int">
+		SELECT count(p1.id) FROM proposal_taxx p1 
+		WHERE 
+		p1.id in (SELECT DISTINCT p2.taxxId FROM proposal_pfb_taxx p2 WHERE p2.type=1)
+        <where>  
+  		  <if test="type != null and type != ''"> and p1.type = #{type} </if>
+  		</where>
+	</select>
+	
+	<select id="tablpjqkMap" resultType="HashMap">
+		SELECT pp1.`name`,pp2.id as taxxId,pp3.sum FROM proposal_cbdw pp1
+		LEFT JOIN (
+		SELECT p1.id,p2.cbdwId FROM proposal_taxx p1
+		LEFT JOIN proposal_taxx_cbdw p2 ON p1.id=p2.taxxId AND p2.type in(1,2)
+		where 1=1
+		<if test="zxjcId != null and zxjcId != ''"> and p1.zxjcId = #{zxjcId} </if>
+		) pp2 ON pp1.id=pp2.cbdwId
+		LEFT JOIN (
+		SELECT p1.taxxId,SUM(p1.fz) sum FROM proposal_pfb_taxx p1
+		WHERE p1.type=#{type}
+		GROUP BY p1.taxxId
+		) pp3 ON pp2.id=pp3.taxxId
+		order by pp1.`name` asc
+	</select>
+
+	<select id="findByNameCount" resultType="int" >
+		select count(p1.id) from proposal_pfb_taxx p1
+		left join sys_user s1 on p1.createId = s1.user_id
+		where s1.name = #{name} and p1.taxxId=#{taxxid}
+	</select>
+</mapper>

@@ -1,0 +1,1150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.TaxxDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.TaxxDO">
+		select p1.*,zxjc.zxjcmc from proposal_taxx p1 LEFT JOIN proposal_zxjc zxjc on p1.zxjcId=zxjc.id  where p1.id = #{value}
+	</select>
+	
+	<select id="getListByIds" resultType="com.bootdo.proposal.domain.TaxxDO">
+		select p1.*,d1.cbdw,d1.xbdw,zxjc.zxjcmc from proposal_taxx p1
+		LEFT JOIN (
+		SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p1.id
+		LEFT JOIN proposal_zxjc zxjc on p1.zxjcId=zxjc.id
+		where p1.id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+	
+	<update id="updateTahClear">
+		update proposal_taxx set `tah` = null where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+
+	<select id="findCbdwjd" resultType="Integer">
+		select (case cbdwjd when '' then 0 else cbdwjd end) cbdwjd  from proposal_taxx_cbdw where taxxId = #{taxxid} and cbdwId = #{cbdwid}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.TaxxDO">
+		select
+		p1.*,(CASE p1.tanx WHEN 1 THEN p1.taz WHEN 2 THEN p1.dwmc END) mc,d1.cbdw,d1.xbdw,zxjc.zxjcmc,grwy.xm,grwy.dwmc_zw,grwy.txdz,grwy.yb,grwy.bglxdh,grwy.sjhm,sswyh.sswyhmc,lbyblsx.talx,
+		(SELECT COUNT(xx.id) FROM proposal_xx xx WHERE p1.id=xx.taxxId AND xx.jsr=#{createid} AND xx.state=0) xxCount,
+		(SELECT COUNT(pf.id) FROM proposal_pfb_taxx pf WHERE pf.taxxId=p1.id <if test="pfType != null and pfType != ''"> AND pf.type=#{pfType} </if>) pfCount,
+		(SELECT COUNT(gbsq.id) FROM proposal_gbsq gbsq WHERE gbsq.taxxId=p1.id) gbsqCount,
+		fhyj.dzs yjdz,fhyj.mcs yjmc,fhhz.dzs hzdz,fhhz.mcs hzmc
+		from proposal_taxx p1
+		LEFT JOIN (
+		SELECT
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		<if test="cbdwId != null and cbdwId != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId} and type=#{taxxCbdwType}) </if>
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p1.id
+		LEFT JOIN proposal_zxjc zxjc on p1.zxjcId=zxjc.id
+		LEFT JOIN proposal_grwy grwy on p1.createId=grwy.userId
+		LEFT JOIN proposal_sswyh sswyh ON grwy.sswyhId=sswyh.id
+		LEFT JOIN proposal_lbyblsx lbyblsx ON p1.lbyblsxId = lbyblsx.id
+		LEFT JOIN (
+		SELECT t1.id,group_concat(fhhz.dz) dzs,group_concat(fhhz.mc) mcs FROM proposal_taxx t1
+		LEFT JOIN proposal_fhhz fhhz ON t1.id=fhhz.taxxid AND fhhz.type=1
+		GROUP BY t1.id
+		) fhyj ON p1.id=fhyj.id
+		LEFT JOIN (
+		SELECT t1.id,group_concat(fhhz.dz) dzs,group_concat(fhhz.mc) mcs FROM proposal_taxx t1
+		LEFT JOIN proposal_fhhz fhhz ON t1.id=fhhz.taxxid AND fhhz.type=2
+		GROUP BY t1.id
+		) fhhz ON p1.id=fhhz.id
+		<where>
+			<if test="id != null and id != ''"> and p1.id = #{id} </if>
+			<if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+			<if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+			<if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+			<if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+			<if test="state != null and state != ''"> and p1.state = #{state} </if>
+			<if test="lsh != null and lsh != ''"> and p1.lsh like #{lsh} </if>
+			<if test="tah != null and tah != ''"> and p1.tah like #{tah} </if>
+			<if test="zxjcid != null and zxjcid != ''"> and p1.zxjcId = #{zxjcid} </if>
+			<if test="tanx != null and tanx != ''"> and p1.tanx = #{tanx} </if>
+			<if test="tatm != null and tatm != ''"> and p1.tatm like #{tatm} </if>
+			<if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+			<if test="lbyblsxid != null and lbyblsxid != ''"> and p1.lbyblsxId = #{lbyblsxid} </if>
+			<if test="isjgdy != null and isjgdy != ''"> and p1.isJgdy = #{isjgdy} </if>
+			<if test="isbrzx != null and isbrzx != ''"> and p1.isBrzx = #{isbrzx} </if>
+			<if test="iszctrcl != null and iszctrcl != ''"> and p1.isZctrcl = #{iszctrcl} </if>
+			<if test="isgktanr != null and isgktanr != ''"> and p1.isGktanr = #{isgktanr} </if>
+			<if test="taz != null and taz != ''"> and p1.taz like #{taz} </if>
+			<if test="gzdwjzw != null and gzdwjzw != ''"> and p1.gzdwjzw like #{gzdwjzw} </if>
+			<if test="txdz != null and txdz != ''"> and p1.txdz like #{txdz} </if>
+			<if test="yb != null and yb != ''"> and p1.yb like #{yb} </if>
+			<if test="lxdh != null and lxdh != ''"> and p1.lxdh like #{lxdh} </if>
+			<if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+			<if test="fytaz != null and fytaz != ''"> and p1.fytaz = #{fytaz} </if>
+			<if test="tanr != null and tanr != ''"> and p1.tanr = #{tanr} </if>
+			<if test="jyxsfsid != null and jyxsfsid != ''"> and p1.jyxsfsId = #{jyxsfsid} </if>
+			<if test="tastate != null and tastate != ''"> and p1.taState = #{tastate} </if>
+			<if test="lastate != null and lastate != ''"> and p1.laState = #{lastate} </if>
+			<if test="xyLaState != null and xyLaState != ''"> and p1.laState &lt; #{xyLaState} </if>
+			<if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+			<if test="zbr != null and zbr != ''"> and p1.zbr = #{zbr} </if>
+			<if test="dwfzr != null and dwfzr != ''"> and p1.dwfzr = #{dwfzr} </if>
+			<if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+			<if test="dzyx != null and dzyx != ''"> and p1.dzyx = #{dzyx} </if>
+			<if test="latype != null and latype != ''"> and p1.laType = #{latype} </if>
+			<if test="isba != null and isba != ''"> and p1.isBa = #{isba} </if>
+			<if test="baid != null and baid != ''"> and p1.baId = #{baid} </if>
+			<if test="iszdta != null and iszdta != ''"> and p1.isZdta = #{iszdta} </if>
+			<if test="isgk != null and isgk != ''"> and p1.isGk = #{isgk} </if>
+			<if test="flid != null and flid != ''"> and p1.flId = #{flid} </if>
+			<if test="ldyj != null and ldyj != ''"> and p1.ldyj = #{ldyj} </if>
+			<if test="taly != null and taly != ''"> and p1.taly = #{taly} </if>
+
+			<if test="cbdwIsNotNull != null and cbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+			<if test="fbdwIsNotNull != null and fbdwIsNotNull != ''"> and d1.fbdw is not null </if>
+			<if test="xbdwIsNotNull != null and xbdwIsNotNull != ''"> and d1.xbdw is not null </if>
+
+			<if test="zxjcid != null and zxjcid != ''"> and zxjc.id = #{zxjcid} </if>
+			<if test="jid != null and jid != ''"> and zxjc.jId = #{jid} </if>
+			<if test="strStartYear != null and strStartYear != ''"> and DATE_FORMAT(p1.createTime,'%Y') &gt;= #{strStartYear} </if>
+			<if test="strEndYear != null and strEndYear != ''"> and DATE_FORMAT(p1.createTime,'%Y') &lt;= #{strEndYear} </if>
+
+			<if test="cbdw != null and cbdw != ''"> and d1.cbdw like #{cbdw} </if>
+			<if test="xbdw != null and xbdw != ''"> and d1.xbdw like #{xbdw} </if>
+			<if test="mc != null and mc != ''"> and (p1.taz like #{mc} or p1.dwmc like #{mc})</if>
+			<if test="zb_bin != null and zb_bin != '' and zb_bin==1"> and p1.isBa is not null and p1.baId is null</if>
+			<if test="zb_bin != null and zb_bin != '' and zb_bin==2"> and p1.isBa is not null and p1.baId is not null</if>
+		</where>
+		<choose>
+			<when test="sort != null and sort.trim() != ''">
+				order by ${sort} ${order}
+			</when>
+			<otherwise>
+				order by p1.id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(p1.id) from proposal_taxx p1
+		LEFT JOIN (
+		SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		<if test="cbdwId != null and cbdwId != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId} and type=#{taxxCbdwType}) </if>
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p1.id
+		LEFT JOIN proposal_zxjc zxjc on p1.zxjcId=zxjc.id
+		LEFT JOIN proposal_grwy grwy on p1.createId=grwy.userId
+		LEFT JOIN proposal_sswyh sswyh ON grwy.sswyhId=sswyh.id
+		LEFT JOIN proposal_lbyblsx lbyblsx ON p1.lbyblsxId = lbyblsx.id
+		<where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+  		  <if test="lsh != null and lsh != ''"> and p1.lsh like #{lsh} </if>
+  		  <if test="tah != null and tah != ''"> and p1.tah like #{tah} </if>
+  		  <if test="zxjcid != null and zxjcid != ''"> and p1.zxjcId = #{zxjcid} </if>
+  		  <if test="tanx != null and tanx != ''"> and p1.tanx = #{tanx} </if>
+  		  <if test="tatm != null and tatm != ''"> and p1.tatm like #{tatm} </if>
+  		  <if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+  		  <if test="lbyblsxid != null and lbyblsxid != ''"> and p1.lbyblsxId = #{lbyblsxid} </if>
+  		  <if test="isjgdy != null and isjgdy != ''"> and p1.isJgdy = #{isjgdy} </if>
+  		  <if test="isbrzx != null and isbrzx != ''"> and p1.isBrzx = #{isbrzx} </if>
+  		  <if test="iszctrcl != null and iszctrcl != ''"> and p1.isZctrcl = #{iszctrcl} </if>
+  		  <if test="isgktanr != null and isgktanr != ''"> and p1.isGktanr = #{isgktanr} </if>
+  		  <if test="taz != null and taz != ''"> and p1.taz like #{taz} </if>
+  		  <if test="gzdwjzw != null and gzdwjzw != ''"> and p1.gzdwjzw like #{gzdwjzw} </if>
+  		  <if test="txdz != null and txdz != ''"> and p1.txdz like #{txdz} </if>
+  		  <if test="yb != null and yb != ''"> and p1.yb like #{yb} </if>
+  		  <if test="lxdh != null and lxdh != ''"> and p1.lxdh like #{lxdh} </if>
+  		  <if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+  		  <if test="fytaz != null and fytaz != ''"> and p1.fytaz = #{fytaz} </if>
+  		  <if test="tanr != null and tanr != ''"> and p1.tanr = #{tanr} </if>
+  		  <if test="jyxsfsid != null and jyxsfsid != ''"> and p1.jyxsfsId = #{jyxsfsid} </if>
+  		  <if test="tastate != null and tastate != ''"> and p1.taState = #{tastate} </if>
+  		  <if test="lastate != null and lastate != ''"> and p1.laState = #{lastate} </if>
+  		  <if test="xyLaState != null and xyLaState != ''"> and p1.laState &lt; #{xyLaState} </if>
+  		  <if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+  		  <if test="zbr != null and zbr != ''"> and p1.zbr = #{zbr} </if>
+  		  <if test="dwfzr != null and dwfzr != ''"> and p1.dwfzr = #{dwfzr} </if>
+  		  <if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+  		  <if test="dzyx != null and dzyx != ''"> and p1.dzyx = #{dzyx} </if>
+  		  <if test="latype != null and latype != ''"> and p1.laType = #{latype} </if>
+  		  <if test="isba != null and isba != ''"> and p1.isBa = #{isba} </if>
+  		  <if test="baid != null and baid != ''"> and p1.baId = #{baid} </if>
+  		  <if test="iszdta != null and iszdta != ''"> and p1.isZdta = #{iszdta} </if>
+  		  <if test="isgk != null and isgk != ''"> and p1.isGk = #{isgk} </if>
+  		  <if test="flid != null and flid != ''"> and p1.flId = #{flid} </if>
+  		  <if test="ldyj != null and ldyj != ''"> and p1.ldyj = #{ldyj} </if>
+  		  <if test="taly != null and taly != ''"> and p1.taly = #{taly} </if>
+  		  
+  		  <if test="cbdwIsNotNull != null and cbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+  		  <if test="fbdwIsNotNull != null and fbdwIsNotNull != ''"> and d1.fbdw is not null </if>
+  		  <if test="xbdwIsNotNull != null and xbdwIsNotNull != ''"> and d1.xbdw is not null </if>
+  		  
+  		  <if test="zxjcid != null and zxjcid != ''"> and zxjc.id = #{zxjcid} </if>
+  		  <if test="jid != null and jid != ''"> and zxjc.jId = #{jid} </if>
+  		  <if test="strStartYear != null and strStartYear != ''"> and DATE_FORMAT(p1.createTime,'%Y') &gt;= #{strStartYear} </if>
+  		  <if test="strEndYear != null and strEndYear != ''"> and DATE_FORMAT(p1.createTime,'%Y') &lt;= #{strEndYear} </if>
+  		  
+  		  <if test="cbdw != null and cbdw != ''"> and d1.cbdw like #{cbdw} </if>
+  		  <if test="xbdw != null and xbdw != ''"> and d1.xbdw like #{xbdw} </if>
+  		  <if test="mc != null and mc != ''"> and (p1.taz like #{mc} or p1.dwmc like #{mc})</if>
+  		  <if test="zb_bin != null and zb_bin != '' and zb_bin==1"> and p1.isBa is not null and p1.baId is null</if>
+  		  <if test="zb_bin != null and zb_bin != '' and zb_bin==2"> and p1.isBa is not null and p1.baId is not null</if>
+  		</where>
+	</select>
+	
+	<select id="listMap" resultType="HashMap">
+		select 
+		p1.*,(CASE p1.tanx WHEN 1 THEN p1.taz WHEN 2 THEN p1.dwmc END) mc,d1.cbdw,d1.xbdw,zxjc.zxjcmc,grwy.xm,grwy.dwmc_zw,grwy.txdz,grwy.yb,grwy.bglxdh,grwy.sjhm,sswyh.sswyhmc,lbyblsx.talx,grwy.fzr,grwy.lxr,
+		(SELECT COUNT(gbsq.id) FROM proposal_gbsq gbsq WHERE gbsq.taxxId=p1.id) gbsqCount
+		from proposal_taxx p1
+		LEFT JOIN (
+		SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		<if test="cbdwId != null and cbdwId != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId} and type=#{taxxCbdwType}) </if>
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p1.id
+		LEFT JOIN proposal_zxjc zxjc on p1.zxjcId=zxjc.id
+		LEFT JOIN proposal_grwy grwy on p1.createId=grwy.userId
+		LEFT JOIN proposal_sswyh sswyh ON grwy.sswyhId=sswyh.id
+		LEFT JOIN proposal_lbyblsx lbyblsx ON p1.lbyblsxId = lbyblsx.id
+        <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+  		  <if test="lsh != null and lsh != ''"> and p1.lsh = #{lsh} </if>
+  		  <if test="tah != null and tah != ''"> and p1.tah = #{tah} </if>
+  		  <if test="zxjcid != null and zxjcid != ''"> and p1.zxjcId = #{zxjcid} </if>
+  		  <if test="tanx != null and tanx != ''"> and p1.tanx = #{tanx} </if>
+  		  <if test="tatm != null and tatm != ''"> and p1.tatm like #{tatm} </if>
+  		  <if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+  		  <if test="lbyblsxid != null and lbyblsxid != ''"> and p1.lbyblsxId = #{lbyblsxid} </if>
+  		  <if test="isjgdy != null and isjgdy != ''"> and p1.isJgdy = #{isjgdy} </if>
+  		  <if test="isbrzx != null and isbrzx != ''"> and p1.isBrzx = #{isbrzx} </if>
+  		  <if test="iszctrcl != null and iszctrcl != ''"> and p1.isZctrcl = #{iszctrcl} </if>
+  		  <if test="isgktanr != null and isgktanr != ''"> and p1.isGktanr = #{isgktanr} </if>
+  		  <if test="taz != null and taz != ''"> and p1.taz like #{taz} </if>
+  		  <if test="gzdwjzw != null and gzdwjzw != ''"> and p1.gzdwjzw = #{gzdwjzw} </if>
+  		  <if test="txdz != null and txdz != ''"> and p1.txdz = #{txdz} </if>
+  		  <if test="yb != null and yb != ''"> and p1.yb = #{yb} </if>
+  		  <if test="lxdh != null and lxdh != ''"> and p1.lxdh = #{lxdh} </if>
+  		  <if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+  		  <if test="fytaz != null and fytaz != ''"> and p1.fytaz = #{fytaz} </if>
+  		  <if test="tanr != null and tanr != ''"> and p1.tanr = #{tanr} </if>
+  		  <if test="jyxsfsid != null and jyxsfsid != ''"> and p1.jyxsfsId = #{jyxsfsid} </if>
+  		  <if test="tastate != null and tastate != ''"> and p1.taState = #{tastate} </if>
+  		  <if test="lastate != null and lastate != ''"> and p1.laState = #{lastate} </if>
+  		  <if test="xyLaState != null and xyLaState != ''"> and p1.laState &lt; #{xyLaState} </if>
+  		  <if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+  		  <if test="zbr != null and zbr != ''"> and p1.zbr = #{zbr} </if>
+  		  <if test="dwfzr != null and dwfzr != ''"> and p1.dwfzr = #{dwfzr} </if>
+  		  <if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+  		  <if test="dzyx != null and dzyx != ''"> and p1.dzyx = #{dzyx} </if>
+  		  <if test="latype != null and latype != ''"> and p1.laType = #{latype} </if>
+  		  <if test="isba != null and isba != ''"> and p1.isBa = #{isba} </if>
+  		  <if test="baid != null and baid != ''"> and p1.baId = #{baid} </if>
+  		  <if test="iszdta != null and iszdta != ''"> and p1.isZdta = #{iszdta} </if>
+  		  <if test="isgk != null and isgk != ''"> and p1.isGk = #{isgk} </if>
+  		  <if test="flid != null and flid != ''"> and p1.flId = #{flid} </if>
+  		  <if test="ldyj != null and ldyj != ''"> and p1.ldyj = #{ldyj} </if>
+  		  <if test="taly != null and taly != ''"> and p1.taly = #{taly} </if>
+  		  
+  		  <if test="cbdwIsNotNull != null and cbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+  		  <if test="fbdwIsNotNull != null and fbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+  		  <if test="xbdwIsNotNull != null and xbdwIsNotNull != ''"> and d1.xbdw is not null </if>
+  		  
+  		  <if test="fid != null and fid != ''"> and (p1.baId = #{fid} or p1.id = #{fid}) </if>
+  		  
+  		  <if test="cbdw != null and cbdw != ''"> and d1.cbdw like #{cbdw} </if>
+  		  <if test="xbdw != null and xbdw != ''"> and d1.xbdw like #{xbdw} </if>
+  		  <if test="mc != null and mc != ''"> and (p1.taz like #{mc} or p1.dwmc like #{mc})</if>
+  		  <if test="zb_bin != null and zb_bin != '' and zb_bin==1"> and p1.isBa is not null and p1.baId is null</if>
+  		  <if test="zb_bin != null and zb_bin != '' and zb_bin==2"> and p1.isBa is not null and p1.baId is not null</if>
+  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by p1.id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="listMapCount" resultType="int">
+		select count(p1.id) from proposal_taxx p1
+		LEFT JOIN (
+		SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		<if test="cbdwId != null and cbdwId != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId} and type=#{taxxCbdwType}) </if>
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p1.id
+		LEFT JOIN proposal_zxjc zxjc on p1.zxjcId=zxjc.id
+		LEFT JOIN proposal_grwy grwy on p1.createId=grwy.userId
+		LEFT JOIN proposal_sswyh sswyh ON grwy.sswyhId=sswyh.id
+		LEFT JOIN proposal_lbyblsx lbyblsx ON p1.lbyblsxId = lbyblsx.id
+        <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+  		  <if test="lsh != null and lsh != ''"> and p1.lsh = #{lsh} </if>
+  		  <if test="tah != null and tah != ''"> and p1.tah = #{tah} </if>
+  		  <if test="zxjcid != null and zxjcid != ''"> and p1.zxjcId = #{zxjcid} </if>
+  		  <if test="tanx != null and tanx != ''"> and p1.tanx = #{tanx} </if>
+  		  <if test="tatm != null and tatm != ''"> and p1.tatm like #{tatm} </if>
+  		  <if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+  		  <if test="lbyblsxid != null and lbyblsxid != ''"> and p1.lbyblsxId = #{lbyblsxid} </if>
+  		  <if test="isjgdy != null and isjgdy != ''"> and p1.isJgdy = #{isjgdy} </if>
+  		  <if test="isbrzx != null and isbrzx != ''"> and p1.isBrzx = #{isbrzx} </if>
+  		  <if test="iszctrcl != null and iszctrcl != ''"> and p1.isZctrcl = #{iszctrcl} </if>
+  		  <if test="isgktanr != null and isgktanr != ''"> and p1.isGktanr = #{isgktanr} </if>
+  		  <if test="taz != null and taz != ''"> and p1.taz like #{taz} </if>
+  		  <if test="gzdwjzw != null and gzdwjzw != ''"> and p1.gzdwjzw = #{gzdwjzw} </if>
+  		  <if test="txdz != null and txdz != ''"> and p1.txdz = #{txdz} </if>
+  		  <if test="yb != null and yb != ''"> and p1.yb = #{yb} </if>
+  		  <if test="lxdh != null and lxdh != ''"> and p1.lxdh = #{lxdh} </if>
+  		  <if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+  		  <if test="fytaz != null and fytaz != ''"> and p1.fytaz = #{fytaz} </if>
+  		  <if test="tanr != null and tanr != ''"> and p1.tanr = #{tanr} </if>
+  		  <if test="jyxsfsid != null and jyxsfsid != ''"> and p1.jyxsfsId = #{jyxsfsid} </if>
+  		  <if test="tastate != null and tastate != ''"> and p1.taState = #{tastate} </if>
+  		  <if test="lastate != null and lastate != ''"> and p1.laState = #{lastate} </if>
+  		  <if test="xyLaState != null and xyLaState != ''"> and p1.laState &lt; #{xyLaState} </if>
+  		  <if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+  		  <if test="zbr != null and zbr != ''"> and p1.zbr = #{zbr} </if>
+  		  <if test="dwfzr != null and dwfzr != ''"> and p1.dwfzr = #{dwfzr} </if>
+  		  <if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+  		  <if test="dzyx != null and dzyx != ''"> and p1.dzyx = #{dzyx} </if>
+  		  <if test="latype != null and latype != ''"> and p1.laType = #{latype} </if>
+  		  <if test="isba != null and isba != ''"> and p1.isBa = #{isba} </if>
+  		  <if test="baid != null and baid != ''"> and p1.baId = #{baid} </if>
+  		  <if test="iszdta != null and iszdta != ''"> and p1.isZdta = #{iszdta} </if>
+  		  <if test="isgk != null and isgk != ''"> and p1.isGk = #{isgk} </if>
+  		  <if test="flid != null and flid != ''"> and p1.flId = #{flid} </if>
+  		  <if test="ldyj != null and ldyj != ''"> and p1.ldyj = #{ldyj} </if>
+  		  <if test="taly != null and taly != ''"> and p1.taly = #{taly} </if>
+  		  
+  		  <if test="cbdwIsNotNull != null and cbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+  		  <if test="fbdwIsNotNull != null and fbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+  		  <if test="xbdwIsNotNull != null and xbdwIsNotNull != ''"> and d1.xbdw is not null </if>
+  		  
+  		  <if test="fid != null and fid != ''"> and (p1.baId = #{fid} or p1.id = #{fid}) </if>
+  		  
+  		  <if test="cbdw != null and cbdw != ''"> and d1.cbdw like #{cbdw} </if>
+  		  <if test="xbdw != null and xbdw != ''"> and d1.xbdw like #{xbdw} </if>
+  		  <if test="mc != null and mc != ''"> and (p1.taz like #{mc} or p1.dwmc like #{mc})</if>
+  		  <if test="zb_bin != null and zb_bin != '' and zb_bin==1"> and p1.isBa is not null and p1.baId is null</if>
+  		  <if test="zb_bin != null and zb_bin != '' and zb_bin==2"> and p1.isBa is not null and p1.baId is not null</if>
+  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.TaxxDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_taxx
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`lsh`, 
+			`tah`, 
+			`zxjcId`, 
+			`tanx`, 
+			`tatm`, 
+			`cbdwId`, 
+			`lbyblsxId`, 
+			`isJgdy`, 
+			`isBrzx`, 
+			`isZctrcl`, 
+			`isGktanr`, 
+			`taz`, 
+			`gzdwjzw`, 
+			`txdz`, 
+			`yb`, 
+			`lxdh`, 
+			`sswyhId`, 
+			`fytaz`, 
+			`tanr`, 
+			`jyxsfsId`, 
+			`taState`, 
+			`laState`, 
+			`dwmc`, 
+			`zbr`, 
+			`dwfzr`, 
+			`lxr`, 
+			`dzyx`, 
+			`laType`, 
+			`isBa`, 
+			`baId`, 
+			`isZdta`, 
+			`isGk`, 
+			`flId`, 
+			`ldyj`,
+			`taly`,
+			`isGkTa`,
+			`jbqk`,
+			`czwt`,
+			`dcjy`,
+			`yzjssjy`,
+			`qtsm`,
+			`fjmc`,
+			`fjdz`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{lsh}, 
+			#{tah}, 
+			#{zxjcid}, 
+			#{tanx}, 
+			#{tatm}, 
+			#{cbdwid}, 
+			#{lbyblsxid}, 
+			#{isjgdy}, 
+			#{isbrzx}, 
+			#{iszctrcl}, 
+			#{isgktanr}, 
+			#{taz}, 
+			#{gzdwjzw}, 
+			#{txdz}, 
+			#{yb}, 
+			#{lxdh}, 
+			#{sswyhid}, 
+			#{fytaz}, 
+			#{tanr}, 
+			#{jyxsfsid}, 
+			#{tastate}, 
+			#{lastate}, 
+			#{dwmc}, 
+			#{zbr}, 
+			#{dwfzr}, 
+			#{lxr}, 
+			#{dzyx}, 
+			#{latype}, 
+			#{isba}, 
+			#{baid}, 
+			#{iszdta}, 
+			#{isgk}, 
+			#{flid}, 
+			#{ldyj},
+			#{taly},
+			#{isgkta},
+			#{jbqk},
+			#{czwt},
+			#{dcjy},
+			#{yzjssjy},
+			#{qtsm},
+			#{fjmc},
+			#{fjdz}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.TaxxDO">
+		update proposal_taxx 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="lsh != null">`lsh` = #{lsh}, </if>
+			<if test="tah != null">`tah` = #{tah}, </if>
+			<if test="zxjcid != null">`zxjcId` = #{zxjcid}, </if>
+			<if test="tanx != null">`tanx` = #{tanx}, </if>
+			<if test="tatm != null">`tatm` = #{tatm}, </if>
+			<if test="cbdwid != null">`cbdwId` = #{cbdwid}, </if>
+			<if test="lbyblsxid != null">`lbyblsxId` = #{lbyblsxid}, </if>
+			<if test="isjgdy != null">`isJgdy` = #{isjgdy}, </if>
+			<if test="isbrzx != null">`isBrzx` = #{isbrzx}, </if>
+			<if test="iszctrcl != null">`isZctrcl` = #{iszctrcl}, </if>
+			<if test="isgktanr != null">`isGktanr` = #{isgktanr}, </if>
+			<if test="taz != null">`taz` = #{taz}, </if>
+			<if test="gzdwjzw != null">`gzdwjzw` = #{gzdwjzw}, </if>
+			<if test="txdz != null">`txdz` = #{txdz}, </if>
+			<if test="yb != null">`yb` = #{yb}, </if>
+			<if test="lxdh != null">`lxdh` = #{lxdh}, </if>
+			<if test="sswyhid != null">`sswyhId` = #{sswyhid}, </if>
+			<if test="fytaz != null">`fytaz` = #{fytaz}, </if>
+			<if test="tanr != null">`tanr` = #{tanr}, </if>
+			<if test="jyxsfsid != null">`jyxsfsId` = #{jyxsfsid}, </if>
+			<if test="tastate != null">`taState` = #{tastate}, </if>
+			<if test="lastate != null">`laState` = #{lastate}, </if>
+			<if test="dwmc != null">`dwmc` = #{dwmc}, </if>
+			<if test="zbr != null">`zbr` = #{zbr}, </if>
+			<if test="dwfzr != null">`dwfzr` = #{dwfzr}, </if>
+			<if test="lxr != null">`lxr` = #{lxr}, </if>
+			<if test="dzyx != null">`dzyx` = #{dzyx}, </if>
+			<if test="latype != null">`laType` = #{latype}, </if>
+			<if test="isba != null">`isBa` = #{isba}, </if>
+			<if test="baid != null">`baId` = #{baid}, </if>
+			<if test="iszdta != null">`isZdta` = #{iszdta}, </if>
+			<if test="isgk != null">`isGk` = #{isgk}, </if>
+			<if test="flid != null">`flId` = #{flid}, </if>
+			<if test="ldyj != null">`ldyj` = #{ldyj},</if>
+			<if test="taly != null">`taly` = #{taly},</if>
+			<if test="isgkta != null">`isGkTa` = #{isgkta},</if>
+			<if test="jbqk != null">`jbqk` = #{jbqk},</if>
+			<if test="czwt != null">`czwt` = #{czwt},</if>
+			<if test="dcjy != null">`dcjy` = #{dcjy},</if>
+			<if test="yzjssjy != null">`yzjssjy` = #{yzjssjy},</if>
+			<if test="qtsm != null">`qtsm` = #{qtsm},</if>
+			<if test="fjmc != null">`fjmc` = #{fjmc},</if>
+			<if test="fjdz != null">`fjdz` = #{fjdz}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="updateIsNull" parameterType="com.bootdo.proposal.domain.TaxxDO">
+		update proposal_taxx 
+		<set>
+			`taState` = #{tastate},
+			`laState` = #{lastate},
+			`tah` = #{tah},
+			`laType` = #{latype},
+			`taly` = #{taly},
+			`isBa` = #{isba},
+			`baId` = #{baid},
+			`isZdta` = #{iszdta},
+			`isGkta` = #{isgkta},
+			`flId` = #{flid},
+			`ldyj` = #{ldyj}
+		</set>
+		where id = #{id}
+	</update>
+	
+	<update id="remove">
+		update proposal_taxx set `state` = 0 where id = #{value}
+	</update>
+	
+	<update id="batchRemove">
+		update proposal_taxx set `state` = 0 where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+	
+	<delete id="realRemove">
+		delete from proposal_taxx where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<update id="batchRecovery">
+		update proposal_taxx set `state` = 1 where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+	
+	<select id="tablList" resultType="com.bootdo.proposal.domain.TaxxDO">
+		select p1.*,d1.cbdw,d1.fbdw,d1.xbdw,g1.type str1,fhyj.dzs yjdz,fhyj.mcs yjmc,fhhz.dzs hzdz,fhhz.mcs hzmc,
+		(SELECT COUNT(xx.id) FROM proposal_xx xx WHERE p1.id=xx.taxxId AND xx.jsr=#{gbsqCreateId} AND xx.state=0) xxCount,
+		(SELECT COUNT(pf.id) FROM proposal_pfb_taxx pf WHERE pf.taxxId=p1.id <if test="pfType != null and pfType != ''"> AND pf.type=#{pfType} </if>) pfCount
+		from proposal_taxx p1
+		LEFT JOIN (
+		SELECT t1.id,group_concat(fhhz.dz) dzs,group_concat(fhhz.mc) mcs FROM proposal_taxx t1
+		LEFT JOIN proposal_fhhz fhhz ON t1.id=fhhz.taxxid AND fhhz.type=1
+		GROUP BY t1.id
+		) fhyj ON p1.id=fhyj.id
+		LEFT JOIN (
+		SELECT t1.id,group_concat(fhhz.dz) dzs,group_concat(fhhz.mc) mcs FROM proposal_taxx t1
+		LEFT JOIN proposal_fhhz fhhz ON t1.id=fhhz.taxxid AND fhhz.type=2
+		GROUP BY t1.id
+		) fhhz ON p1.id=fhhz.id
+		LEFT JOIN (
+		SELECT
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		<if test="cbdwId != null and cbdwId != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId} and type=#{taxxCbdwType}) </if>
+		<if test="cbdwId2 != null and cbdwId2 != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId2}) </if>
+		<if test="cbdwId3 != null and cbdwId3 != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId3}) </if>
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p1.id
+		LEFT JOIN proposal_gbsq g1 ON p1.id=g1.taxxId
+
+
+
+		<if test="gbsqCreateId != null and gbsqCreateId != ''"> and g1.createId = #{gbsqCreateId} </if>
+		<where>
+			<if test="id != null and id != ''"> and p1.id = #{id} </if>
+			<if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+			<if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+			<if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+			<if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+			<if test="state != null and state != ''"> and p1.state = #{state} </if>
+			<if test="lsh != null and lsh != ''"> and p1.lsh = #{lsh} </if>
+			<if test="tah != null and tah != ''"> and p1.tah = #{tah} </if>
+			<if test="zxjcid != null and zxjcid != ''"> and p1.zxjcId = #{zxjcid} </if>
+			<if test="tanx != null and tanx != ''"> and p1.tanx = #{tanx} </if>
+			<if test="tatm != null and tatm != ''"> and p1.tatm = #{tatm} </if>
+			<if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+			<if test="lbyblsxid != null and lbyblsxid != ''"> and p1.lbyblsxId = #{lbyblsxid} </if>
+			<if test="isjgdy != null and isjgdy != ''"> and p1.isJgdy = #{isjgdy} </if>
+			<if test="isbrzx != null and isbrzx != ''"> and p1.isBrzx = #{isbrzx} </if>
+			<if test="iszctrcl != null and iszctrcl != ''"> and p1.isZctrcl = #{iszctrcl} </if>
+			<if test="isgktanr != null and isgktanr != ''"> and p1.isGktanr = #{isgktanr} </if>
+			<if test="taz != null and taz != ''"> and p1.taz = #{taz} </if>
+			<if test="gzdwjzw != null and gzdwjzw != ''"> and p1.gzdwjzw = #{gzdwjzw} </if>
+			<if test="txdz != null and txdz != ''"> and p1.txdz = #{txdz} </if>
+			<if test="yb != null and yb != ''"> and p1.yb = #{yb} </if>
+			<if test="lxdh != null and lxdh != ''"> and p1.lxdh = #{lxdh} </if>
+			<if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+			<if test="fytaz != null and fytaz != ''"> and p1.fytaz = #{fytaz} </if>
+			<if test="tanr != null and tanr != ''"> and p1.tanr = #{tanr} </if>
+			<if test="jyxsfsid != null and jyxsfsid != ''"> and p1.jyxsfsId = #{jyxsfsid} </if>
+			<if test="tastate != null and tastate != ''"> and p1.taState = #{tastate} </if>
+			<if test="dyTastate != null and dyTastate != ''"> and p1.taState &gt; #{dyTastate} </if>
+			<if test="lastate != null and lastate != ''"> and p1.laState = #{lastate} </if>
+			<if test="xyLaState != null and xyLaState != ''"> and p1.laState &lt; #{xyLaState} </if>
+			<if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+			<if test="zbr != null and zbr != ''"> and p1.zbr = #{zbr} </if>
+			<if test="dwfzr != null and dwfzr != ''"> and p1.dwfzr = #{dwfzr} </if>
+			<if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+			<if test="dzyx != null and dzyx != ''"> and p1.dzyx = #{dzyx} </if>
+			<if test="latype != null and latype != ''"> and p1.laType = #{latype} </if>
+			<if test="isba != null and isba != ''"> and p1.isBa = #{isba} </if>
+			<if test="baid != null and baid != ''"> and p1.baId = #{baid} </if>
+			<if test="iszdta != null and iszdta != ''"> and p1.isZdta = #{iszdta} </if>
+			<if test="isgk != null and isgk != ''"> and p1.isGk = #{isgk} </if>
+			<if test="flid != null and flid != ''"> and p1.flId = #{flid} </if>
+			<if test="ldyj != null and ldyj != ''"> and p1.ldyj = #{ldyj} </if>
+			<if test="taly != null and taly != ''"> and p1.taly = #{taly} </if>
+
+			<if test="cbdwIsNotNull != null and cbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+			<if test="fbdwIsNotNull != null and fbdwIsNotNull != ''"> and d1.fbdw is not null </if>
+			<if test="xbdwIsNotNull != null and xbdwIsNotNull != ''"> and d1.xbdw is not null </if>
+			<if test="cbdwId2 != null and cbdwId2 != ''"> and (d1.cbdw is not null or d1.fbdw is not null or d1.xbdw is not null) </if>
+		</where>
+		<choose>
+			<when test="sort != null and sort.trim() != ''">
+				order by ${sort} ${order}
+			</when>
+			<otherwise>
+				order by p1.id desc
+			</otherwise>
+		</choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="tablCount" resultType="int">
+		select count(p1.id) from proposal_taxx p1
+		LEFT JOIN (
+		SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		<if test="cbdwId != null and cbdwId != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId} and type=#{taxxCbdwType}) </if>
+		<if test="cbdwId2 != null and cbdwId2 != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId2}) </if>
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p1.id
+		 <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+  		  <if test="lsh != null and lsh != ''"> and p1.lsh = #{lsh} </if>
+  		  <if test="tah != null and tah != ''"> and p1.tah = #{tah} </if>
+  		  <if test="zxjcid != null and zxjcid != ''"> and p1.zxjcId = #{zxjcid} </if>
+  		  <if test="tanx != null and tanx != ''"> and p1.tanx = #{tanx} </if>
+  		  <if test="tatm != null and tatm != ''"> and p1.tatm = #{tatm} </if>
+  		  <if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+  		  <if test="lbyblsxid != null and lbyblsxid != ''"> and p1.lbyblsxId = #{lbyblsxid} </if>
+  		  <if test="isjgdy != null and isjgdy != ''"> and p1.isJgdy = #{isjgdy} </if>
+  		  <if test="isbrzx != null and isbrzx != ''"> and p1.isBrzx = #{isbrzx} </if>
+  		  <if test="iszctrcl != null and iszctrcl != ''"> and p1.isZctrcl = #{iszctrcl} </if>
+  		  <if test="isgktanr != null and isgktanr != ''"> and p1.isGktanr = #{isgktanr} </if>
+  		  <if test="taz != null and taz != ''"> and p1.taz = #{taz} </if>
+  		  <if test="gzdwjzw != null and gzdwjzw != ''"> and p1.gzdwjzw = #{gzdwjzw} </if>
+  		  <if test="txdz != null and txdz != ''"> and p1.txdz = #{txdz} </if>
+  		  <if test="yb != null and yb != ''"> and p1.yb = #{yb} </if>
+  		  <if test="lxdh != null and lxdh != ''"> and p1.lxdh = #{lxdh} </if>
+  		  <if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+  		  <if test="fytaz != null and fytaz != ''"> and p1.fytaz = #{fytaz} </if>
+  		  <if test="tanr != null and tanr != ''"> and p1.tanr = #{tanr} </if>
+  		  <if test="jyxsfsid != null and jyxsfsid != ''"> and p1.jyxsfsId = #{jyxsfsid} </if>
+  		  <if test="tastate != null and tastate != ''"> and p1.taState = #{tastate} </if>
+  		  <if test="lastate != null and lastate != ''"> and p1.laState = #{lastate} </if>
+  		  <if test="xyLaState != null and xyLaState != ''"> and p1.laState &lt; #{xyLaState} </if>
+  		  <if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+  		  <if test="zbr != null and zbr != ''"> and p1.zbr = #{zbr} </if>
+  		  <if test="dwfzr != null and dwfzr != ''"> and p1.dwfzr = #{dwfzr} </if>
+  		  <if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+  		  <if test="dzyx != null and dzyx != ''"> and p1.dzyx = #{dzyx} </if>
+  		  <if test="latype != null and latype != ''"> and p1.laType = #{latype} </if>
+  		  <if test="isba != null and isba != ''"> and p1.isBa = #{isba} </if>
+  		  <if test="baid != null and baid != ''"> and p1.baId = #{baid} </if>
+  		  <if test="iszdta != null and iszdta != ''"> and p1.isZdta = #{iszdta} </if>
+  		  <if test="isgk != null and isgk != ''"> and p1.isGk = #{isgk} </if>
+  		  <if test="flid != null and flid != ''"> and p1.flId = #{flid} </if>
+  		  <if test="ldyj != null and ldyj != ''"> and p1.ldyj = #{ldyj} </if>
+  		  <if test="taly != null and taly != ''"> and p1.taly = #{taly} </if>
+  		  
+  		  <if test="cbdwIsNotNull != null and cbdwIsNotNull != ''"> and d1.cbdw is not null </if>
+  		  <if test="fbdwIsNotNull != null and fbdwIsNotNull != ''"> and d1.fbdw is not null </if>
+  		  <if test="xbdwIsNotNull != null and xbdwIsNotNull != ''"> and d1.xbdw is not null </if>
+  		  <if test="cbdwId2 != null and cbdwId2 != ''"> and (d1.cbdw is not null or d1.fbdw is not null or d1.xbdw is not null) </if>
+  		</where>
+	</select>
+	
+	
+	<select id="getMaxLsh" resultType="int">
+		SELECT IFNULL(MAX(p1.lsh+0),0) lsh FROM proposal_taxx p1 WHERE p1.state=1 and p1.zxjcId = #{zxjcId}
+	</select>
+	
+	<select id="getMaxTah" resultType="int">
+		SELECT IFNULL(MAX(p1.tah+0),0) tah FROM proposal_taxx p1 WHERE p1.state=1 and p1.zxjcId = #{zxjcId}
+	</select>
+	
+	<select id="getMaxTahById" resultType="int">
+		SELECT IFNULL(MAX(p1.tah+0),0) tah FROM proposal_taxx p1 WHERE p1.state=1 and p1.laState=1 and p1.zxjcId = (SELECT p2.zxjcId FROM proposal_taxx p2 WHERE p2.id=#{value})
+	</select>
+	
+	<select id="getMaxYjhById" resultType="int">
+		SELECT IFNULL(MAX(p1.tah+0),0) tah FROM proposal_taxx p1 WHERE p1.state=1 and p1.laState=2 and p1.zxjcId = (SELECT p2.zxjcId FROM proposal_taxx p2 WHERE p2.id=#{value})
+	</select>
+	
+	<update id="updateBaZ" parameterType="HashMap">
+		update proposal_taxx 
+		set isBa=#{isba}, baId=null
+		where id = #{id}
+	</update>
+	
+	<update id="updateBaF" parameterType="HashMap">
+		update proposal_taxx 
+		set isBa=#{isba},baId=#{baid}
+		<if test="tah != null">,tah=#{tah}</if>
+		where id in 
+		<foreach item="id" collection="fids" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</update>
+	
+	<update id="updateTahAndSon" parameterType="com.bootdo.proposal.domain.TaxxDO">
+		update proposal_taxx 
+		<set>
+			<if test="tah != null">`tah` = #{tah},</if>
+			<if test="tastate != null">`taState` = #{tastate} </if>
+		</set>
+		where id = #{id} or baId=#{id}
+	</update>
+
+	<update id="updateCbdwjd" parameterType="HashMap" >
+		update proposal_taxx_cbdw
+		SET
+	    cbdwjd = #{cbdwjd}
+		where taxxId = #{taxxid} and cbdwId = #{cbdwid}
+	</update>
+	
+	<select id="getCbdwGroupConcat" resultType="HashMap">
+		SELECT p1.type,group_concat(p1.cbdwId) cbdwId,group_concat(p2.`name`) name FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE p1.taxxId=#{taxxid}
+		GROUP BY p1.type
+	</select>
+	
+	<select id="tamltj" resultType="HashMap">
+		select p1.ID,p1.tatm,p1.tah,p1.lsh,p1.iszdta,d1.cbdw,d1.xbdw,s1.name xm,p1.isba,p1.baid from proposal_taxx p1
+		LEFT JOIN (SELECT 
+		pp1.taxxId,
+		max(case pp1.type when 1 then pp1.cbdwId when 2 then pp1.cbdwId else null end) cbdw ,
+		max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+		FROM (
+		SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+		SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+		LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+		WHERE 1=1
+		<if test="cbdwId != null and cbdwId != ''"> and p1.taxxId in(SELECT DISTINCT taxxId FROM proposal_taxx_cbdw WHERE cbdwId=#{cbdwId} and type=#{taxxCbdwType}) </if>
+		ORDER BY CONVERT(p2.`Name` USING gbk)
+		) c1
+		GROUP BY c1.taxxId,c1.type
+		) pp1
+		GROUP BY pp1.taxxId) d1 ON d1.taxxId=p1.id
+		LEFT JOIN sys_user s1 ON s1.user_id=p1.createId
+        <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+  		  <if test="lsh != null and lsh != ''"> and p1.lsh = #{lsh} </if>
+  		  <if test="tah != null and tah != ''"> and p1.tah = #{tah} </if>
+  		  <if test="zxjcid != null and zxjcid != ''"> and p1.zxjcId = #{zxjcid} </if>
+  		  <if test="tanx != null and tanx != ''"> and p1.tanx = #{tanx} </if>
+  		  <if test="tatm != null and tatm != ''"> and p1.tatm like #{tatm} </if>
+  		  <if test="cbdwid != null and cbdwid != ''"> and p1.cbdwId = #{cbdwid} </if>
+  		  <if test="lbyblsxid != null and lbyblsxid != ''"> and p1.lbyblsxId = #{lbyblsxid} </if>
+  		  <if test="isjgdy != null and isjgdy != ''"> and p1.isJgdy = #{isjgdy} </if>
+  		  <if test="isbrzx != null and isbrzx != ''"> and p1.isBrzx = #{isbrzx} </if>
+  		  <if test="iszctrcl != null and iszctrcl != ''"> and p1.isZctrcl = #{iszctrcl} </if>
+  		  <if test="isgktanr != null and isgktanr != ''"> and p1.isGktanr = #{isgktanr} </if>
+  		  <if test="taz != null and taz != ''"> and p1.taz = #{taz} </if>
+  		  <if test="gzdwjzw != null and gzdwjzw != ''"> and p1.gzdwjzw = #{gzdwjzw} </if>
+  		  <if test="txdz != null and txdz != ''"> and p1.txdz = #{txdz} </if>
+  		  <if test="yb != null and yb != ''"> and p1.yb = #{yb} </if>
+  		  <if test="lxdh != null and lxdh != ''"> and p1.lxdh = #{lxdh} </if>
+  		  <if test="sswyhid != null and sswyhid != ''"> and p1.sswyhId = #{sswyhid} </if>
+  		  <if test="fytaz != null and fytaz != ''"> and p1.fytaz = #{fytaz} </if>
+  		  <if test="tanr != null and tanr != ''"> and p1.tanr = #{tanr} </if>
+  		  <if test="jyxsfsid != null and jyxsfsid != ''"> and p1.jyxsfsId = #{jyxsfsid} </if>
+  		  <if test="tastate != null and tastate != ''"> and p1.taState = #{tastate} </if>
+  		  <if test="dyTastate != null and dyTastate != ''"> and p1.taState &gt; #{dyTastate} </if>
+  		  <if test="lastate != null and lastate != ''"> and p1.laState = #{lastate} </if>
+  		  <if test="xyLaState != null and xyLaState != ''"> and p1.laState &lt; #{xyLaState} </if>
+  		  <if test="dwmc != null and dwmc != ''"> and p1.dwmc = #{dwmc} </if>
+  		  <if test="zbr != null and zbr != ''"> and p1.zbr = #{zbr} </if>
+  		  <if test="dwfzr != null and dwfzr != ''"> and p1.dwfzr = #{dwfzr} </if>
+  		  <if test="lxr != null and lxr != ''"> and p1.lxr = #{lxr} </if>
+  		  <if test="dzyx != null and dzyx != ''"> and p1.dzyx = #{dzyx} </if>
+  		  <if test="latype != null and latype != ''"> and p1.laType = #{latype} </if>
+  		  <if test="isba != null and isba != ''"> and p1.isBa = #{isba} </if>
+  		  <if test="baid != null and baid != ''"> and p1.baId = #{baid} </if>
+  		  <if test="iszdta != null and iszdta != ''"> and p1.isZdta = #{iszdta} </if>
+  		  <if test="isgk != null and isgk != ''"> and p1.isGk = #{isgk} </if>
+  		  <if test="flid != null and flid != ''"> and p1.flId = #{flid} </if>
+  		  <if test="ldyj != null and ldyj != ''"> and p1.ldyj = #{ldyj} </if>
+  		  <if test="taly != null and taly != ''"> and p1.taly = #{taly} </if>
+  		  <if test="xm != null and xm != ''"> and s1.name like #{xm} </if>
+  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by p1.tah+0 asc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<select id="bltayjtj" resultType="HashMap">
+		SELECT pp1.`name`,pp2.tah,pp2.tahCount,pp3.yjh,pp3.yjhCount FROM proposal_cbdw pp1 LEFT JOIN (
+		SELECT p1.`name`,group_concat(p3.tah) tah,COUNT(p3.id) tahCount FROM proposal_cbdw p1 
+		LEFT JOIN proposal_taxx_cbdw p2 ON p1.id=p2.cbdwId
+		LEFT JOIN proposal_taxx p3 ON p2.taxxId=p3.id AND p3.laState=1 and p3.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND p3.zxjcId=#{zxjcId} </if>
+		GROUP BY p1.`name`
+		) pp2 ON pp1.`name`=pp2.`name`
+		LEFT JOIN (
+		SELECT p1.`name`,group_concat(p5.tah) yjh,COUNT(p5.id) yjhCount FROM proposal_cbdw p1 
+		LEFT JOIN proposal_taxx_cbdw p4 ON p1.id=p4.cbdwId
+		LEFT JOIN proposal_taxx p5 ON p4.taxxId=p5.id AND p5.laState=2 and p5.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND p5.zxjcId=#{zxjcId} </if>
+		GROUP BY p1.`name`
+		) pp3 ON pp1.`name`=pp3.`name`
+	</select>
+	
+	<select id="tatjb" resultType="HashMap">
+		SELECT p1.dwmc,COUNT(p2.id) count,COUNT( CASE WHEN p2.laState=1 THEN 1 ELSE NULL END ) as la FROM proposal_grwy p1 
+		LEFT JOIN proposal_taxx p2 ON p1.userId=p2.createId and p2.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND p2.zxjcId=#{zxjcId} </if>
+		WHERE p1.type=#{type}
+		GROUP BY p1.dwmc
+	</select>
+	
+	<select id="tacbdwhz" resultType="HashMap">
+		SELECT p1.id,p1.`name`,p3.taxxId,p3.type,p4.tah,p4.lsh,p4.laState,p4.taState FROM proposal_cbdw p1 
+		LEFT JOIN proposal_taxx_cbdw p3 ON p1.id=p3.cbdwId
+		LEFT JOIN proposal_taxx p4 ON p3.taxxId=p4.id and p4.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND p4.zxjcId=#{zxjcId} </if>
+		<if test="dyTastate != null and dyTastate != ''"> AND p4.taState &gt; #{dyTastate} </if>
+		<if test="lastate != null and lastate != ''"> AND p4.laState = #{lastate} </if>
+		ORDER BY CONVERT(p1.`name` USING gbk),p4.tah+0 ASC
+	</select>
+	
+	<select id="grtatjb" resultType="HashMap">
+		SELECT p1.xm,COUNT(p2.id) count,COUNT( CASE WHEN p2.laState=1 THEN 1 ELSE NULL END ) as la FROM proposal_grwy p1 
+		LEFT JOIN proposal_taxx p2 ON p1.userId=p2.createId and p2.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND p2.zxjcId=#{zxjcId} </if>
+		WHERE p1.type=#{type}
+		GROUP BY p1.xm
+	</select>
+	<select id="zxtaqk" resultType="HashMap">
+		SELECT (CASE p1.type WHEN 1 THEN p1.xm WHEN 2 THEN p1.dwmc END) mc,p2.id taxxId,p2.tah,p2.lsh,p2.laState,p2.taState  FROM proposal_grwy p1 
+		LEFT JOIN proposal_taxx p2 ON p2.createId=p1.userId and p2.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND p2.zxjcId=#{zxjcId} </if>
+		WHERE p1.type=#{type}
+		ORDER BY CONVERT(mc USING gbk)
+	</select>
+	<select id="taflml" resultType="HashMap">
+		SELECT pp3.talx,pp1.tah,(CASE pp1.tanx WHEN 1 THEN pp1.taz WHEN 2 THEN pp1.dwmc ELSE null END) mc,pp1.txdz,pp1.tatm,pp2.cbdw FROM proposal_lbyblsx pp3
+		LEFT JOIN proposal_taxx pp1 ON pp1.flId=pp3.id and pp1.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND pp1.zxjcId=#{zxjcId} </if>
+		LEFT JOIN (
+		SELECT p1.id,group_concat(p3.`name`) cbdw FROM proposal_taxx p1 
+		LEFT JOIN proposal_taxx_cbdw p2 ON p1.id=p2.taxxId
+		LEFT JOIN proposal_cbdw p3 ON p2.cbdwId=p3.id
+		GROUP BY p1.id
+		) pp2 ON pp1.id=pp2.id
+		ORDER BY pp3.id
+	</select>
+	
+	<select id="taflzhtj" resultType="HashMap">
+		SELECT pp3.talx,
+		COUNT( CASE WHEN pp1.laState=1 THEN 1 ELSE NULL END ) as la, 
+		COUNT( CASE WHEN pp1.laState=2 THEN 1 ELSE NULL END ) as blazyj, 
+		COUNT( CASE WHEN pp1.laState=3 THEN 1 ELSE NULL END ) as blath,
+		COUNT(pp1.id) as hj
+		FROM proposal_lbyblsx pp3
+		LEFT JOIN proposal_taxx pp1 ON pp1.flId=pp3.id and pp1.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND pp1.zxjcId=#{zxjcId} </if>
+		LEFT JOIN (
+		SELECT p1.id,group_concat(p3.`name`) cbdw FROM proposal_taxx p1 
+		LEFT JOIN proposal_taxx_cbdw p2 ON p1.id=p2.taxxId
+		LEFT JOIN proposal_cbdw p3 ON p2.cbdwId=p3.id
+		GROUP BY p1.id
+		) pp2 ON pp1.id=pp2.id
+		GROUP BY pp3.talx
+	</select>
+	<select id="zyjmltj" resultType="HashMap">
+		SELECT pp1.tah,(CASE pp1.tanx WHEN 1 THEN pp1.taz WHEN 2 THEN pp1.dwmc END) mc,
+		pp1.txdz,pp1.tatm,pp2.cbdw
+		FROM proposal_taxx pp1
+		LEFT JOIN (
+		SELECT p1.id,group_concat(p3.`name`) cbdw FROM proposal_taxx p1 
+		LEFT JOIN proposal_taxx_cbdw p2 ON p1.id=p2.taxxId
+		LEFT JOIN proposal_cbdw p3 ON p2.cbdwId=p3.id
+		GROUP BY p1.id
+		) pp2 ON pp1.id=pp2.id
+		WHERE 1=1 AND pp1.laState=2 and pp1.state=1
+		<if test="zxjcId != null and zxjcId != ''">  AND pp1.zxjcId=#{zxjcId} </if>
+		order by pp2.cbdw asc,pp1.tah asc
+	</select>
+	
+	<select id="cbdwInfoDate" resultType="HashMap">
+		SELECT p1.cbdwId,COUNT(p1.id) z,COUNT(CASE WHEN p2.taState>=6 THEN 1 ELSE NULL END) ybl FROM proposal_taxx_cbdw p1
+		LEFT JOIN proposal_taxx p2 ON p1.taxxId=p2.id
+		WHERE p2.state=1 AND p2.zxjcId=#{zxjcId}
+		<if test="cbdwId != null and cbdwId != ''">  AND p1.cbdwId=#{cbdwId} </if>
+		<if test="userId != null and userId != ''">  AND p1.cbdwId=(SELECT z1.dwmcId FROM proposal_grwy z1 WHERE z1.userId=#{userId}) </if>
+		GROUP BY p1.cbdwId
+	</select>
+	
+	<select id="glyInfoDate" resultType="HashMap">
+		SELECT 
+		COUNT(p1.id) allNumber, 
+		COUNT(CASE WHEN p1.tanx=1 THEN 1 ELSE NULL END) grAll,
+		COUNT(CASE WHEN p1.tanx=2 THEN 1 ELSE NULL END) jtAll,
+		COUNT(CASE WHEN p1.taState=0 THEN 1 ELSE NULL END) ys,
+		COUNT(CASE WHEN p1.taState=1 THEN 1 ELSE NULL END) fs,
+		COUNT(CASE WHEN p1.taState=2 THEN 1 ELSE NULL END) zs,
+		COUNT(CASE WHEN p1.taState=3 THEN 1 ELSE NULL END) dzj,
+		COUNT(CASE WHEN p1.laState=1 THEN 1 ELSE NULL END) la,
+		COUNT(CASE WHEN p1.laState=2 THEN 1 ELSE NULL END) yj,
+		COUNT(CASE WHEN p1.laState=3 THEN 1 ELSE NULL END) th
+		FROM proposal_taxx p1 
+		WHERE p1.zxjcId=#{zxjcId} AND p1.state=1
+		GROUP BY p1.zxjcId
+	</select>
+	
+	<select id="exportWordArrData" resultType="HashMap">
+		SELECT 
+		p2.id taxxId,p3.`name`,p2.tatm,p2.tanr,p2.tah,(CASE p2.tanx WHEN 1 THEN p2.taz WHEN 2 THEN p2.dwmc END) mc,p2.fytaz,p2.zbr,zxjc.zxjcmc,p2.ldyj,p2.tanx,
+		p2.isJgdy,p2.isBrzx,p2.isZctrcl,p2.isGktanr,
+		p2.isgk,p2.laState,lbyblsx.talx,d1.cbdw,d1.fbdw,d1.xbdw,
+		p4.dwmc_zw,p4.txdz,p4.sjhm,dp.dpmc,sswyh.sswyhmc,tajb.tajbmc,dqxz.dqxz,
+		p4.yb,p4.fzr,p4.lxr
+		FROM proposal_taxx_cbdw p1
+		LEFT JOIN proposal_taxx p2 ON p1.taxxId=p2.id
+		LEFT JOIN proposal_cbdw p3 ON p1.cbdwId=p3.id
+		LEFT JOIN proposal_grwy p4 ON p4.userId=p2.createId
+		LEFT JOIN proposal_dp dp ON p4.ssdpId=dp.id
+		LEFT JOIN proposal_sswyh sswyh ON p4.sswyhId=sswyh.id
+		LEFT JOIN proposal_tajb tajb ON p4.ssjbId=tajb.id
+		LEFT JOIN proposal_dqxz dqxz ON p4.ssdqId=dqxz.id
+		LEFT JOIN proposal_lbyblsx lbyblsx ON p2.flId=lbyblsx.id
+		LEFT JOIN proposal_zxjc zxjc ON p2.zxjcId=zxjc.id
+		LEFT JOIN (
+				SELECT 
+				pp1.taxxId,
+				max(case pp1.type when 1 then pp1.cbdwId else null end) cbdw ,
+				max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw ,
+				max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+				FROM (
+				SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+				SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+				LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+				WHERE 1=1
+				ORDER BY CONVERT(p2.`Name` USING gbk)
+				) c1
+				GROUP BY c1.taxxId,c1.type
+				) pp1
+				GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p2.id
+		WHERE p2.id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+	<select id="exportWordArrFhData" resultType="HashMap">
+		SELECT p3.`name`,p2.tatm,p2.tah,p4.type,p4.dz,p4.mc,(CASE p2.tanx WHEN 1 THEN p2.taz WHEN 2 THEN p2.dwmc END) xm FROM proposal_taxx_cbdw p1
+		LEFT JOIN proposal_taxx p2 ON p1.taxxId=p2.id
+		LEFT JOIN proposal_cbdw p3 ON p1.cbdwId=p3.id
+		LEFT JOIN proposal_fhhz p4 ON p2.id=p4.taxxid
+		WHERE p2.id in
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</select>
+	
+	<select id="exportWordData" resultType="HashMap">
+		SELECT 
+		p2.tatm,p2.tanr,p2.tah,(CASE p2.tanx WHEN 1 THEN p2.taz WHEN 2 THEN p2.dwmc END) mc,p2.fytaz,p2.zbr,zxjc.zxjcmc,p2.ldyj,p2.tanx,p2.isBa,p2.baId,
+		p2.isJgdy,p2.isBrzx,p2.isZctrcl,p2.isGktanr,
+		p2.isgk,p2.laState,lbyblsx.talx,d1.cbdw,d1.fbdw,d1.xbdw,
+		p4.dwmc_zw,p4.txdz,p4.sjhm,dp.dpmc,sswyh.sswyhmc,tajb.tajbmc,dqxz.dqxz,
+		p4.yb,p4.fzr,p4.lxr
+		FROM proposal_taxx p2
+		LEFT JOIN proposal_grwy p4 ON p4.userId=p2.createId
+		LEFT JOIN proposal_dp dp ON p4.ssdpId=dp.id
+		LEFT JOIN proposal_sswyh sswyh ON p4.sswyhId=sswyh.id
+		LEFT JOIN proposal_tajb tajb ON p4.ssjbId=tajb.id
+		LEFT JOIN proposal_dqxz dqxz ON p4.ssdqId=dqxz.id
+		LEFT JOIN proposal_lbyblsx lbyblsx ON p2.flId=lbyblsx.id
+		LEFT JOIN proposal_zxjc zxjc ON p2.zxjcId=zxjc.id
+		LEFT JOIN (
+				SELECT 
+				pp1.taxxId,
+				max(case pp1.type when 1 then pp1.cbdwId else null end) cbdw ,
+				max(case pp1.type when 2 then pp1.cbdwId else null end) fbdw ,
+				max(case pp1.type when 3 then pp1.cbdwId else null end) xbdw
+				FROM (
+				SELECT c1.taxxId,c1.type,group_concat(c1.`name`) cbdwId FROM (
+				SELECT p1.taxxId,p1.type,p2.`name` FROM proposal_taxx_cbdw p1 
+				LEFT JOIN proposal_cbdw p2 ON p1.cbdwId=p2.id
+				WHERE 1=1
+				ORDER BY CONVERT(p2.`Name` USING gbk)
+				) c1
+				GROUP BY c1.taxxId,c1.type
+				) pp1
+				GROUP BY pp1.taxxId
+		) d1 ON d1.taxxId=p2.id
+		WHERE p2.id=#{id}
+	</select>
+	
+	<update id="updateQxba" parameterType="HashMap">
+		update proposal_taxx 
+		set isBa=null, baId=null
+		where id = #{id}
+	</update>
+
+
+	<select id="findUserId" resultType="Integer" >
+		select  id from proposal_cbdw where name = #{name}
+	</select>
+
+	<select id="findCountByName" resultType="java.lang.String">
+		select GROUP_CONCAT(c1.name) FROM proposal_taxx_cbdw p1
+		left join proposal_cbdw c1 on c1.id=p1.cbdwId
+		where p1.taxxid=#{taxxid} and type=3
+	</select>
+	
+</mapper>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+						<input id="id" name="id" th:value="${jtwy.id}"  type="hidden">
+							<div class="form-group">	
+								<label class="col-sm-2 control-label">所属界次：</label>
+								<div class="col-sm-4">
+									<!-- <input id="ssjcidVal" th:value="${jtwy.ssjcid}" class="form-control" type="hidden"> -->
+									<select id="ssjcid" name="ssjcid" class="form-control">
+										<option th:value="${jtwy.ssjcid}" th:text="${ssjcName}"></option>
+									</select>
+									
+								</div>
+								<!-- <label class="col-sm-2 control-label">所属界别：</label>
+								<div class="col-sm-4">
+									<input id="ssjbidVal" th:value="${jtwy.ssjbid}" class="form-control" type="hidden">
+									<select id="ssjbid" name="ssjbid" class="form-control">
+										<option th:value="${jtwy.ssjbid}" th:text="${ssjbName}"></option>
+									</select>
+								</div> -->
+							</div>
+							<!-- <div class="form-group">	
+								<label class="col-sm-2 control-label">所属委员会：</label>
+								<div class="col-sm-4">
+									<input id="sswyhidVal" th:value="${jtwy.sswyhid}" class="form-control" type="hidden">
+									<select id="sswyhid" name="sswyhid" class="form-control">
+										<option th:value="${jtwy.sswyhid}" th:text="${sswyhName}"></option>
+									</select>
+								</div>
+								<label class="col-sm-2 control-label">地区小组：</label>
+								<div class="col-sm-4">
+									<input id="ssdqidVal" th:value="${jtwy.ssdqid}" class="form-control" type="hidden">
+									<select id="ssdqid" name="ssdqid" class="form-control">
+										<option th:value="${jtwy.ssdqid}" th:text="${dqxzName}"></option>
+									</select>
+								</div>
+							</div> -->
+							
+							<div class="form-group">	
+								<label class="col-sm-2 control-label">负责人：</label>
+								<div class="col-sm-4">
+									<input id="fzr" name="fzr" th:value="${jtwy.fzr}" class="form-control" type="text">
+								</div>
+								<label class="col-sm-2 control-label">单位名称：</label>
+								<div class="col-sm-4">
+									<input id="dwmc" name="dwmc" th:value="${jtwy.dwmc}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-2 control-label">联系人：</label>
+								<div class="col-sm-4">
+									<input id="lxr" name="lxr" th:value="${jtwy.lxr}" class="form-control" type="text">
+								</div>
+								<label class="col-sm-2 control-label">通讯地址：</label>
+								<div class="col-sm-4">
+									<input id="txdz" name="txdz" th:value="${jtwy.txdz}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-2 control-label">邮编：</label>
+								<div class="col-sm-4">
+									<input id="yb" name="yb" th:value="${jtwy.yb}" class="form-control" type="text">
+								</div>
+								<label class="col-sm-2 control-label">职务：</label>
+								<div class="col-sm-4">
+									<input id="zw" name="zw" th:value="${jtwy.zw}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-2 control-label">办公联系电话：</label>
+								<div class="col-sm-4">
+									<input id="bglxdh" name="bglxdh" th:value="${jtwy.bglxdh}" class="form-control" type="text">
+								</div>
+								<label class="col-sm-2 control-label">手机号码：</label>
+								<div class="col-sm-4">
+									<input id="sjhm" name="sjhm" th:value="${jtwy.sjhm}" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-2 control-label">登录用户名：</label>
+								<div class="col-sm-4">
+									<input name="userid" type="hidden" th:value="${jtwy.userid}" >
+									<input id="userName" name="userName" th:value="${jtwy.userName}" class="form-control" type="text">
+									<input id="userName2" type="hidden" th:value="${jtwy.userName}" class="form-control">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-2 control-label">登录密码：</label>
+								<div class="col-sm-4">
+									<input id="pwd" name="pwd" class="form-control" type="password" th:value="${jtwy.pwd}" />
+								</div>
+								<label class="col-sm-2 control-label">确认密码：</label>
+								<div class="col-sm-4">
+									<input id="contrastPwd" name="contrastPwd" class="form-control" type="password" th:value="${jtwy.pwd}">
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="submit" class="btn btn-primary">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/jtwy/edit.js">
+	</script>
+</body>
+</html>

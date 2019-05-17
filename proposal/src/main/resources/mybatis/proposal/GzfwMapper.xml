@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.GzfwDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.GzfwDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`lx`,`bt`,`nr`,`fjmc`,`fjdz` from proposal_gzfw where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.GzfwDO">
+		select p1.*,s1.`name` createName from proposal_gzfw p1
+		LEFT JOIN sys_user s1 ON p1.createId=s1.user_id
+        <where>  
+		  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+		  		  <if test="lx != null and lx != ''"> and p1.lx = #{lx} </if>
+		  		  <if test="bt != null and bt != ''"> and p1.bt like #{bt} </if>
+		  		  <if test="nr != null and nr != ''"> and p1.nr = #{nr} </if>
+		  		  <if test="fjmc != null and fjmc != ''"> and p1.fjmc = #{fjmc} </if>
+		  		  <if test="fjdz != null and fjdz != ''"> and p1.fjdz = #{fjdz} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by p1.id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_gzfw p1
+		LEFT JOIN sys_user s1 ON p1.createId=s1.user_id
+		<where>  
+		  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+		  		  <if test="lx != null and lx != ''"> and p1.lx = #{lx} </if>
+		  		  <if test="bt != null and bt != ''"> and p1.bt like #{bt} </if>
+		  		  <if test="nr != null and nr != ''"> and p1.nr = #{nr} </if>
+		  		  <if test="fjmc != null and fjmc != ''"> and p1.fjmc = #{fjmc} </if>
+		  		  <if test="fjdz != null and fjdz != ''"> and p1.fjdz = #{fjdz} </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.GzfwDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_gzfw
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`lx`, 
+			`bt`, 
+			`nr`, 
+			`fjmc`, 
+			`fjdz`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{lx}, 
+			#{bt}, 
+			#{nr}, 
+			#{fjmc}, 
+			#{fjdz}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.GzfwDO">
+		update proposal_gzfw 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="lx != null">`lx` = #{lx}, </if>
+			<if test="bt != null">`bt` = #{bt}, </if>
+			<if test="nr != null">`nr` = #{nr}, </if>
+			<if test="fjmc != null">`fjmc` = #{fjmc}, </if>
+			<if test="fjdz != null">`fjdz` = #{fjdz}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_gzfw where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_gzfw where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+</mapper>

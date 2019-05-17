@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<input id="taxxid" name="taxxid" th:value="${taxxid}"  type="hidden">
+							<input id="id" name="id" th:value="${id}"  type="hidden">
+							<input id="lastate" name="lastate" th:value="${lastate}"  type="hidden">
+							
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">建议立案类型：</label>
+								<div class="col-sm-4 hidden" id="laTypeDiv">
+									<label><input type="radio" name="latype" value="1" th:checked="${latype==1 || (latype!=1 && latype!=2 && latype!=3)}"/>独办</label>
+									<label><input type="radio" name="latype" value="2" th:checked="${latype==2}"/>分半</label>
+									<label><input type="radio" name="latype" value="3" th:checked="${latype==3}"/>会办</label>
+								</div>
+							</div>
+							
+							<div class="form-group hidden" id="cbdwDiv">	
+								<label class="col-sm-3 control-label">建议承办单位：</label>
+								<div class="col-sm-8">
+									<input id="cbdwVal" class="form-control" type="hidden" th:value="${cbdw}" />
+									<select id="cbdw" name="cbdw" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group hidden" id="fbdwDiv">	
+								<label class="col-sm-3 control-label">建议分办单位：</label>
+								<div class="col-sm-8">
+									<input id="fbdwVal" class="form-control" type="hidden" th:value="${fbdw}" />
+									<select id="fbdw" name="fbdw" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div>
+							
+							<div class="form-group hidden" id="xbdwDiv">	
+								<label class="col-sm-3 control-label">建议协办单位：</label>
+								<div class="col-sm-8">
+									<input id="xbdwVal" class="form-control" type="hidden" th:value="${xbdw}" />
+									<select id="xbdw" name="xbdw" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div>
+							
+							<!-- 终审才有 -->
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">改办原因：</label>
+								<div class="col-sm-8">
+									<textarea rows="5" style="width:375px;" id="ly" name="ly" th:text="${ly}"></textarea>
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="button" class="btn btn-primary" th:class="${gbsqType==1 ? 'btn btn-primary disabled' : 'btn btn-primary'}" onclick="tijiao(this);">提交</button>
+									<button shiro:hasPermission="proposal:tabl:bl"  type="button" class="btn btn-primary " 	th:class="${id==null || gbsqType==1 ? 'btn btn-primary hidden' : 'btn btn-primary'}" onclick="remove();">撤销</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tabl/sqgb.js">
+	</script>
+</body>
+</html>

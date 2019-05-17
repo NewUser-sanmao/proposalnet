@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content ">
+    <div class="col-sm-12">
+        <div class="ibox">
+            <div class="ibox-body">
+                <div class="fixed-table-toolbar">
+                    <div class="columns pull-left">
+                        <select id="zxjcid" class="form-control" style="width: 250px;float:left;">
+                        </select>
+                        <button class="btn btn-success" onclick="dc()">导出“政协提案交办清单”</button>
+                        <button class="btn btn-success" onclick="dc_dg()">导出“政协提案交办清单”-单个</button>
+                    </div>
+                </div>
+                <table id="exampleTable" data-mobile-responsive="true">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script type="text/javascript" src="/js/appjs/proposal/tjfx/cbdwtajbqd.js?v=2019-01-23"></script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.ZxjcDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.ZxjcDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`jId`,`jmc`,`zxjcmc`,`zxjcqsh`,`qsrq`,`zjrq` from proposal_zxjc where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.ZxjcDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`jId`,`jmc`,`zxjcmc`,`zxjcqsh`,`qsrq`,`zjrq` from proposal_zxjc
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="jid != null and jid != ''"> and jId = #{jid} </if>
+		  		  <if test="jmc != null and jmc != ''"> and jmc = #{jmc} </if>
+		  		  <if test="zxjcmc != null and zxjcmc != ''"> and zxjcmc = #{zxjcmc} </if>
+		  		  <if test="zxjcqsh != null and zxjcqsh != ''"> and zxjcqsh = #{zxjcqsh} </if>
+		  		  <if test="qsrq != null and qsrq != ''"> and qsrq = #{qsrq} </if>
+		  		  <if test="zjrq != null and zjrq != ''"> and zjrq = #{zjrq} </if>
+		  		  <if test="isExpired != null and isExpired == '1'"> and qsrq &lt;= now() and zjrq &gt;= now() </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_zxjc
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="jid != null and jid != ''"> and jId = #{jid} </if>
+		  		  <if test="jmc != null and jmc != ''"> and jmc = #{jmc} </if>
+		  		  <if test="zxjcmc != null and zxjcmc != ''"> and zxjcmc = #{zxjcmc} </if>
+		  		  <if test="zxjcqsh != null and zxjcqsh != ''"> and zxjcqsh = #{zxjcqsh} </if>
+		  		  <if test="qsrq != null and qsrq != ''"> and qsrq = #{qsrq} </if>
+		  		  <if test="zjrq != null and zjrq != ''"> and zjrq = #{zjrq} </if>
+		  		  <if test="isExpired != null and isExpired == '1'"> and qsrq &lt;= now() and zjrq &gt;= now() </if>
+		  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.ZxjcDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_zxjc
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`jId`, 
+			`jmc`, 
+			`zxjcmc`, 
+			`zxjcqsh`, 
+			`qsrq`, 
+			`zjrq`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{jid}, 
+			#{jmc}, 
+			#{zxjcmc}, 
+			#{zxjcqsh}, 
+			#{qsrq}, 
+			#{zjrq}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.ZxjcDO">
+		update proposal_zxjc 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="jid != null">`jId` = #{jid}, </if>
+			<if test="jmc != null">`jmc` = #{jmc}, </if>
+			<if test="zxjcmc != null">`zxjcmc` = #{zxjcmc}, </if>
+			<if test="zxjcqsh != null">`zxjcqsh` = #{zxjcqsh}, </if>
+			<if test="qsrq != null">`qsrq` = #{qsrq}, </if>
+			<if test="zjrq != null">`zjrq` = #{zjrq}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_zxjc where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_zxjc where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+	
+	<select id="selectAllSelect" resultType="HashMap">
+		select id,zxjcmc text from proposal_zxjc
+	</select>
+	
+	<select id="getNewest" resultType="com.bootdo.proposal.domain.ZxjcDO">
+		SELECT p2.* FROM proposal_zxjc p2
+		WHERE p2.id=(
+		SELECT MAX(p1.id) FROM proposal_zxjc p1
+		WHERE p1.state=1)
+	</select>
+	
+</mapper>

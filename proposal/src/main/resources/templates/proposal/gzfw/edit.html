@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<input id="id" name="id" th:value="${gzfw.id}"  type="hidden">
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">类型：</label>
+								<div class="col-sm-8">
+									<select id="lx" name="lx" class="form-control">
+										<option th:selected="${gzfw.lx=='通知'}" value="通知">通知</option>
+										<option th:selected="${gzfw.lx=='提案选题参考目录'}" value="提案选题参考目录">提案选题参考目录</option>
+										<option th:selected="${gzfw.lx=='政情通报'}" value="政情通报">政情通报</option>
+										<option th:selected="${gzfw.lx=='提案办理情况通报'}" value="提案办理情况通报">提案办理情况通报</option>
+										<option th:selected="${gzfw.lx=='工作交流'}" value="工作交流">工作交流</option>
+									</select>
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">标题：</label>
+								<div class="col-sm-8">
+									<input id="bt" name="bt" class="form-control" type="text" th:value="${gzfw.bt}">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">内容：</label>
+								<div class="col-sm-8">
+									<input id="nr" name="nr" class="form-control" type="hidden" th:value="${gzfw.nr}">
+									<div class="ibox-content no-padding">
+										<div id="summernote_nr"></div>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">附件：</label>
+								<div class="col-sm-8">
+									<input id="fjmc" type="hidden" th:value="${gzfw.fjmc}">
+									<input id="fjdz" type="hidden" th:value="${gzfw.fjdz}">
+									<div class="file-loading">
+									    <input id="inputFiles" name="inputFiles" type="file" multiple>
+									</div>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="submit" class="btn btn-primary">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/gzfw/edit.js">
+	</script>
+</body>
+</html>

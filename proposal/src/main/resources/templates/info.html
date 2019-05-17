@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>欢迎页</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+</head>
+<body style="font-size: 20px;">
+<div th:if="${type=='cbdw'}" class="col-lg-12">
+<p class="" style="padding-top: 10px;">本次会议期间共提交提案(<span style="color: #f00;" th:text="${allNumber}"></span>)件，其中本单位需办(<span style="color: #f00;" th:text="${data.z}"></span>)件，已办理(<span style="color: #f00;" th:text="${data.ybl}"></span>)件</p>
+<p class="" style="" th:utext="${str1}"></p>
+</div>
+<div th:if="${type=='wy'}" class="col-lg-12">
+<p class="" style="padding-top: 10px">欢迎使用渝北提案管理系统</p>
+<p class="" style="" th:utext="${str1}"></p>
+</div>
+<div th:if="${type=='gly'}" class="col-lg-12">
+<p class="" style="padding-top: 10px">提交案件共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.allNumber}"></span>)件，其中个人提案(<span style="color: #f00;" th:text="${data==null ? 0 : data.grAll}"></span>)件，集体提案(<span style="color: #f00;" th:text="${data==null ? 0 : data.jtAll}"></span>)件</p>
+<p class="">待预审案件共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.ys}"></span>)件，待复审案件共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.fs}"></span>)件，待终审案件共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.zs}"></span>)件，待转交案件共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.dzj}"></span>)件</p>
+<p class="">已立案共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.la}"></span>)件，不立案转意见共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.yj}"></span>)件，退回提案共计(<span style="color: #f00;" th:text="${data==null ? 0 : data.th}"></span>)件</p>
+</div>
+<div style="clear: both;"></div>
+<div th:if="${noticeText !='' && noticeText != null || noticeText != 'null'}">
+    <div style="height: 2px;background-color: #000;margin: 20px 20px 30px 20px;"></div>
+    <div style="padding-left: 20px;color:#f00">注意事项：</div>
+    <div class="panel" th:utext="${noticeText}" style="padding-left: 20px;"></div>
+</div>
+</body>
+</html>

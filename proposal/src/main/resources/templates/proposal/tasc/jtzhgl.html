@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-left">
+							<button shiro:hasPermission="proposal:tasc:ck" type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(chakan);">
+								<i class="fa fa-edit" aria-hidden="true"></i>查看
+							</button>
+							<button shiro:hasPermission="proposal:tasc:thta" type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(thta)">
+								<i class="fa fa-edit" aria-hidden="true"></i>退回提案
+							</button>
+							<button shiro:hasPermission="proposal:tasc:zdta" type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(zdta)">
+								<i class="fa fa-edit" aria-hidden="true"></i>重点提案
+							</button>
+							<button type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(dc)">
+								<i class="fa fa-edit" aria-hidden="true"></i>导出提案
+							</button>
+							<button type="button" class="btn btn-primary"
+								onclick="dcArr();">
+								<i class="fa fa-edit" aria-hidden="true"></i>批量导出
+							</button>
+							<button shiro:hasPermission="proposal:tasc:batchRemove" type="button" class="btn  btn-danger"
+								onclick="batchRemove()">
+								<i class="fa fa-trash" aria-hidden="true"></i>删除
+							</button>
+						</div>
+						<div class="columns pull-right">
+							<button class="btn btn-success" onclick="reLoad()">查询</button>
+						</div>
+						<div class="columns pull-right col-md-2 nopadding">
+							<input id="searchName" type="text" class="form-control"
+								placeholder="">
+						</div>
+					</div>
+					<input id="type" type="hidden" th:value="${type}" />
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_thta_h = 'hidden';
+				var s_zdta_h = 'hidden';
+				var s_xgtah_h = 'hidden';
+				var s_ck_h = 'hidden';
+			</script>
+		</div>
+		
+		<div shiro:hasPermission="proposal:tasc:thta">
+			<script type="text/javascript">
+				s_thta_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:zdta">
+			<script type="text/javascript">
+				s_zdta_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:xgtah">
+			<script type="text/javascript">
+				s_xgtah_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:ck">
+			<script type="text/javascript">
+				s_ck_h = '';
+			</script>
+		</div>
+		
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tasc/jtzhgl.js"></script>
+</body>
+</html>

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<input id="taxxid" name="taxxid" th:value="${taxxid}"  type="hidden">
+							<input id="type" name="type" th:value="${type}"  type="hidden">
+							
+							<div th:each="pfb:${pfbs}">
+								<div class="form-group">
+									<label class="col-sm-1 control-label"></label>
+									<div class="col-sm-10" th:text="${pfb.xh+'.'+pfb.nr+'['+pfb.jzf+']'}">
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-sm-1 control-label"></label>
+									<div class="col-sm-10">
+										评分：<input type="number" min="0" th:max="${pfb.jzf}" th:value="${ptMap[pfb.id]!=null ? ptMap[pfb.id] : '' }" name="pfInput" th:attr="pfbId=${pfb.id},id=${pfb.id}"/>
+									</div>
+								</div>
+							</div>
+							
+							<div th:if="${type==1}">
+								<div class="form-group">
+									<label class="col-sm-1 control-label"></label>
+									<div class="col-sm-10" style="color: #f00;">
+										结果：1.优秀提案（<span style="color: #4c98f6;" id="yxta" th:text="${total>=90 ? '√' : ''}"></span>）（总分90分以上），2.合格提案（<span style="color: #4c98f6;" id="hgta" th:text="${total>=70 && total<90 ? '√' : ''}"></span>）（70-89分），3.较差提案（<span style="color: #4c98f6;" id="jxta" th:text="${total<70 ? '√' : ''}"></span>）（69分以下）。
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-sm-1 control-label"></label>
+									<div class="col-sm-10">
+										总分：<input type="number" id="zf" th:value="${total}" disabled="disabled"/>
+									</div>
+								</div>
+							</div>
+							<input id="type" type="hidden" th:value="${type}" />
+							<div th:if="${type==2}">
+								<div class="form-group">
+									<label class="col-sm-1 control-label"></label>
+									<div class="col-sm-10" style="color: #f00;">
+										结果：1.满意（<span style="color: #4c98f6;" id="my" th:text="${total>=85 ? '√' : ''}"></span>）（总分为85分以上），2.基本满意（<span style="color: #4c98f6;" id="jbmy" th:text="${total>=60 && total<85 ? '√' : ''}"></span>）（60-84分），3.不满意（<span style="color: #4c98f6;" id="bmy" th:text="${total<60 ? '√' : ''}"></span>）（59分以下）。
+									</div>
+								</div>
+								
+								<div class="form-group">
+									<label class="col-sm-1 control-label"></label>
+									<div class="col-sm-10">
+										总分：<input type="number" id="zf" th:value="${total}" disabled="disabled"/>
+									</div>
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<div class="col-sm-10 col-sm-offset-1">
+									<button type="submit" class="btn btn-primary">提交</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+	</div>
+	</div>
+	<div th:include="include::footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tabl/pf.js">
+	</script>
+</body>
+</html>

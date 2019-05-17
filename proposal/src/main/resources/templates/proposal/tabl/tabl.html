@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-left">
+							<!-- <button shiro:hasPermission="proposal:tabl:add" type="button" class="btn  btn-primary" onclick="add()">
+								<i class="fa fa-plus" aria-hidden="true"></i>添加
+							</button> -->
+							<button shiro:hasPermission="proposal:tasc:zj" id="zjButton" type="button" class="btn  btn-primary hidden"
+								onclick="zjClick()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>转交
+							</button>
+						</div>
+						<div class="columns pull-right">
+							<button class="btn btn-success" onclick="reLoad()">查询</button>
+						</div>
+						<div class="columns pull-right col-md-2 nopadding">
+							<input id="searchName" type="text" class="form-control"
+								placeholder="">
+						</div>
+					</div>
+					<input id="type" type="hidden" th:value="${type}" />
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_bl_h = 'hidden';
+				var s_sqgb_h = 'hidden';
+				var s_yj_h = 'hidden';
+				var s_zs_h = 'hidden';
+				var s_gt_h = 'hidden';
+				var s_fhyjg_h = 'hidden';
+				var s_zsfhhz_h = 'hidden';
+				var s_pf_h = 'hidden';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tabl:bl">
+			<script type="text/javascript">
+				s_bl_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tabl:sqgb">
+			<script type="text/javascript">
+				s_sqgb_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tabl:yj">
+			<script type="text/javascript">
+				s_yj_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tabl:gt">
+			<script type="text/javascript">
+				s_gt_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tabl:fhyjg">
+			<script type="text/javascript">
+				s_fhyjg_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tabl:fhyjg">
+			<script type="text/javascript">
+				s_zsfhhz_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tabl:pf">
+			<script type="text/javascript">
+				s_pf_h = '';
+			</script>
+		</div>
+		
+		
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tabl/tabl.js?v=2019-02-21"></script>
+</body>
+</html>

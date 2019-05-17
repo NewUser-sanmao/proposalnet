@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-left">
+							<label><input type="checkbox" name="type" value="1"/>个人委员</label>
+							<label><input type="checkbox" name="type" value="2"/>集体委员</label>
+							<label><input type="checkbox" name="type" value="3"/>承办单位</label>
+						</div>
+						<div class="columns col-md-7 nopadding">
+							<textarea id="text" name="text" style="line-height: 1.5;width: 95%;height: 95px;"></textarea>
+						</div>
+						<div class="columns pull-left">
+							<button shiro:hasPermission="proposal:xtgj:fs" id="addButton" type="button" class="btn  btn-primary" onclick="fs()">
+								<i class="fa fa-plus" aria-hidden="true"></i>发送
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript">
+		$(function(){
+			
+		});
+		function fs(){
+			if($("#text").val() == ""){
+				layer.msg("请填写发送内容");
+				return;
+			}
+			if($("input[name='type']:checked").length == 0){
+				layer.msg("请选择发送对象");
+				return;
+			}
+			
+			layer.confirm('确定要发送该信息吗？', {
+				btn : [ '确定', '取消' ]
+			}, function() {
+				var type = "";
+				$("input[name='type']:checked").each(function(){
+					type += $(this).val()+",";
+				});
+				type = type.substring(0,type.length-1);
+				$.ajax({
+					url : "/proposal/xtgj/fs",
+					type : "post",
+					data : {
+						'type' : type,
+						'text' : $("#text").val()
+					},
+					success : function(r) {
+						if (r.code==0) {
+							layer.msg(r.msg);
+							reLoad();
+						}else{
+							layer.msg(r.msg);
+						}
+					}
+				});
+			});
+		}
+	</script>
+</body>
+</html>

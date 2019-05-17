@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-left">
+							<select id="tanx" class="form-control" onchange="reLoad();">
+								<option value="" selected="selected">所有提案</option>
+								<option value="1">个人提案</option>
+								<option value="2">集体提案</option>
+							</select>
+						</div>
+						<div class="columns pull-left">
+							<select id="zxjcid" class="form-control" onchange="reLoad();"> </select>
+						</div>
+						
+						<div class="columns pull-left">
+							<select id="lastate" class="form-control" onchange="reLoad();">
+								<option value="">所有</option>
+								<option value="1">立案</option>
+								<option value="2">不立案转意见</option>
+								<option value="3">不立案退回</option>
+							</select>
+						</div>
+						<div class="columns pull-left">
+							<select id="zb_bin" class="form-control" onchange="reLoad();">
+								<option value="">不分主被</option>
+								<option value="1">主并</option>
+								<option value="2">被并</option>
+							</select>
+						</div>
+						
+						<div class="columns pull-left">
+							<!-- <button shiro:hasPermission="proposal:tasc:ck" type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(chakan);">
+								<i class="fa fa-edit" aria-hidden="true"></i>查看
+							</button> -->
+							<button shiro:hasPermission="proposal:tasc:bjta" type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(showBjta);">
+								<i class="fa fa-edit" aria-hidden="true"></i>编辑提案
+							</button>
+							<button shiro:hasPermission="proposal:tasc:thta" type="button" class="btn btn-primary"
+								onclick="showThta();">
+								<i class="fa fa-edit" aria-hidden="true"></i>退回提案
+							</button>
+							<button shiro:hasPermission="proposal:tasc:zdta" type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(zdta)">
+								<i class="fa fa-edit" aria-hidden="true"></i>重点提案
+							</button>
+							<button type="button" class="btn btn-primary"
+								onclick="getIdImplementFun(dc)">
+								<i class="fa fa-edit" aria-hidden="true"></i>导出提案内容
+							</button>
+							<button type="button" class="btn btn-primary"
+								onclick="showDcnr();">
+								<i class="fa fa-edit" aria-hidden="true"></i>批量导出提案内容
+							</button>
+							<button type="button" class="btn btn-primary"
+								onclick="showFhdc();">
+								<i class="fa fa-edit" aria-hidden="true"></i>批量导出复函
+							</button>
+							<button shiro:hasPermission="proposal:tasc:zcbl" type="button" class="btn btn-primary"
+								onclick="zcbl();">
+								<i class="fa fa-edit" aria-hidden="true"></i>再次交办
+							</button>
+							
+							<button shiro:hasPermission="proposal:tasc:batchRemove" type="button" class="btn  btn-danger"
+								onclick="batchRemove()">
+								<i class="fa fa-trash" aria-hidden="true"></i>删除
+							</button>
+							<button type="button" class="btn btn-primary" onclick="showSearch();">
+								<i class="fa fa-search" aria-hidden="true"></i>高级搜索
+							</button>
+						</div>
+						<div class="columns pull-right">
+							<button class="btn btn-success" onclick="reLoad()">查询</button>
+						</div>
+						<div class="columns pull-right col-md-2 nopadding">
+							<input id="searchName" type="text" class="form-control"
+								placeholder="提案题目">
+						</div>
+					</div>
+					<input id="type" type="hidden" th:value="${type}" />
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="dcnr" class="wrapper wrapper-content" style="display: none;">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">选择导出类型：</label>
+								<div class="col-sm-8">
+									<label><input type="radio" value="1" name="dcnr_type" checked="checked"/>办理单位</label><label><input type="radio" value="2" name="dcnr_type"/>提案号</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="button" class="btn btn-primary" onclick="dcArr();">导出</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="fhdc" class="wrapper wrapper-content" style="display: none;">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">选择导出类型：</label>
+								<div class="col-sm-8">
+									<label><input type="radio" value="1" name="fhdc_type" checked="checked"/>办理单位</label><label><input type="radio" value="2" name="fhdc_type"/>提案号</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="button" class="btn btn-primary" onclick="dcArrFh();">导出</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="thta" class="wrapper wrapper-content" style="display: none;">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<div class="form-group">	
+								<label class="col-sm-4 control-label">选择退回类型：</label>
+								<div class="col-sm-7">
+									<label><input type="radio" value="1" name="thta_type" checked="checked"/>退回到上个版本</label><label><input type="radio" value="2" name="thta_type"/>退回到预审</label>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-7 col-sm-offset-4">
+									<button type="button" class="btn btn-primary" onclick="getIdImplementFun(thta);">退回</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div id="search" class="wrapper wrapper-content" style="display: none;">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">流水号：</label>
+								<div class="col-sm-8">
+									<input id="lsh" name="lsh" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">提案号：</label>
+								<div class="col-sm-8">
+									<input id="tah" name="tah" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">提案者：</label>
+								<div class="col-sm-8">
+									<input id="taz" name="taz" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">承办单位：</label>
+								<div class="col-sm-8">
+									<input id="cbdw" name="cbdw" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">协办单位：</label>
+								<div class="col-sm-8">
+									<input id="xbdw" name="tatm" class="form-control" type="text">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="button" class="btn btn-primary" onclick="reLoad();">查询</button>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<button type="button" class="btn btn-primary" onclick="empty();">清空</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_thta_h = 'hidden';
+				var s_zdta_h = 'hidden';
+				var s_xgtah_h = 'hidden';
+				var s_ck_h = 'hidden';
+			</script>
+		</div>
+		
+		<div shiro:hasPermission="proposal:tasc:thta">
+			<script type="text/javascript">
+				s_thta_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:zdta">
+			<script type="text/javascript">
+				s_zdta_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:xgtah">
+			<script type="text/javascript">
+				s_xgtah_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:ck">
+			<script type="text/javascript">
+				s_ck_h = '';
+			</script>
+		</div>
+		
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tasc/grzhgl.js?v=2019-01-21"></script>
+</body>
+</html>

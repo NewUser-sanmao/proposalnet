@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+	<div class="wrapper wrapper-content ">
+		<div class="col-sm-12">
+			<div class="ibox">
+				<div class="ibox-body">
+					<div class="fixed-table-toolbar">
+						<div class="columns pull-left">
+							<select id="tanx" class="form-control" onchange="reLoad();">
+								<option value="" selected="selected">所有提案</option>
+								<option value="1">个人提案</option>
+								<option value="2">集体提案</option>
+							</select>
+						</div>
+						<div class="columns pull-left col-md-1 nopadding" style="width: 13%;">
+							<select id="zxjcid" class="form-control" onchange="reLoad();"> </select>
+						</div>
+						<div class="columns pull-left">
+							<select id="lastate" class="form-control" onchange="reLoad();">
+								<option value="">所有</option>
+								<option value="1">立案</option>
+								<option value="2">不立案转意见</option>
+								<option value="3">不立案退回</option>
+							</select>
+						</div>
+						<div class="columns pull-left">
+							<select id="zb_bin" class="form-control" onchange="reLoad();">
+								<option value="">不分主被</option>
+								<option value="1">主并</option>
+								<option value="2">被并</option>
+							</select>
+						</div>
+						
+						<div class="columns pull-left">
+							<!-- <button shiro:hasPermission="proposal:tasc:add" type="button" class="btn  btn-primary" onclick="add()">
+								<i class="fa fa-plus" aria-hidden="true"></i>添加
+							</button> -->
+							<button shiro:hasPermission="proposal:tasc:batchRemove" type="button" class="btn  btn-danger"
+								onclick="batchRemove()">
+								<i class="fa fa-trash" aria-hidden="true"></i>删除
+							</button>
+							<button shiro:hasPermission="proposal:tasc:zj" id="zjButton" type="button" class="btn  btn-primary hidden"
+								onclick="zjClick()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>转交
+							</button>
+							<button shiro:hasPermission="proposal:tasc:bh" id="bhButton" type="button" class="btn  btn-primary hidden"
+								onclick="bhClick()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>编号
+							</button>
+							<button shiro:hasPermission="proposal:tasc:cxbh" id="cxbhButton" type="button" class="btn  btn-primary hidden"
+								onclick="cxbhClick()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>重新编号
+							</button>
+							<button shiro:hasPermission="proposal:tasc:sdbh" id="sdbhButton" type="button" class="btn  btn-primary hidden"
+								onclick="sdbhClick()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>手动编号
+							</button>
+							<button shiro:hasPermission="proposal:tasc:hbta" id="hbtaButton" type="button" class="btn  btn-primary hidden"
+								onclick="hbtaClick()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>合并提案
+							</button>
+							<button shiro:hasPermission="proposal:tasc:qxba" id="qxbaButton" type="button" class="btn  btn-primary hidden"
+								onclick="qxbaClick()">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>取消并案
+							</button>
+							<button id="lafsdxButton" shiro:hasPermission="proposal:tasc:lafsdx" type="button" class="btn  btn-primary hidden"
+								onclick="showFadxDiv(1,'[立案]')">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>[立案]发送短信
+							</button>
+							<button id="zjfsdxButton" shiro:hasPermission="proposal:tasc:zjfsdx" type="button" class="btn  btn-primary hidden"
+								onclick="showFadxDiv(2,'[转交]')">
+								<i class="fa fa-mail-forward" aria-hidden="true"></i>[转交]发送短信
+							</button>
+							<button type="button" class="btn btn-primary" onclick="showSearch();">
+								<i class="fa fa-search" aria-hidden="true"></i>高级搜索
+							</button>
+						</div>
+						<div class="columns pull-right">
+							<button class="btn btn-success" onclick="reLoad()">查询</button>
+						</div>
+						<div class="columns pull-right col-md-2 nopadding">
+							<input id="searchName" type="text" class="form-control" placeholder="">
+						</div>
+						<div class="columns pull-right col-md-1 nopadding">
+							提案题目：
+						</div>
+					</div>
+					<input id="tastate" type="hidden" th:value="${type}" />
+					<input id="xyLaState" type="hidden"/>
+					<table id="exampleTable" data-mobile-responsive="true">
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="search" class="wrapper wrapper-content" style="display: none;">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<!-- <div class="form-group">	
+								<label class="col-sm-3 control-label">政协界次：</label>
+								<div class="col-sm-8">
+									<select id="zxjcid" class="form-control" style="width: 450px;">
+									</select>
+								</div>
+							</div> -->
+							<!-- <div class="form-group">	
+								<label class="col-sm-3 control-label">提案类型：</label>
+								<div class="col-sm-8">
+									<select id="lastate" class="form-control">
+										<option value=" ">所有提案类型</option>
+										<option value="1">立案</option>
+										<option value="2">不立案转意见</option>
+										<option value="3">不立案退回</option>
+									</select>
+								</div>
+							</div> -->
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">流水号：</label>
+								<div class="col-sm-8">
+									<input id="lsh" name="lsh" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">提案号：</label>
+								<div class="col-sm-8">
+									<input id="tah" name="tah" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">提案者：</label>
+								<div class="col-sm-8">
+									<input id="taz" name="taz" class="form-control" type="text">
+								</div>
+							</div>
+							<!-- <div class="form-group">	
+								<label class="col-sm-3 control-label">提案题目：</label>
+								<div class="col-sm-8">
+									<input id="tatm" name="tatm" class="form-control" type="text">
+								</div>
+							</div> -->
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">承办单位：</label>
+								<div class="col-sm-8">
+									<input id="cbdw" name="cbdw" class="form-control" type="text">
+								</div>
+							</div>
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">协办单位：</label>
+								<div class="col-sm-8">
+									<input id="xbdw" name="tatm" class="form-control" type="text">
+								</div>
+							</div>
+							
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="button" class="btn btn-primary" onclick="reLoad();">查询</button>
+									&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+									<button type="button" class="btn btn-primary" onclick="empty();">清空</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<div id="fadxDiv" class="wrapper wrapper-content" style="display: none;">
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="ibox float-e-margins">
+					<div class="ibox-content">
+						<form class="form-horizontal m-t" id="signupForm">
+							<input id="fadxDivType" name="type" type="hidden" />
+							<input id="fadxDivStr" name="type" type="hidden" />
+							<div class="form-group">	
+								<label class="col-sm-3 control-label">请选择届次：</label>
+								<div class="col-sm-8">
+									<select id="fadxDivZxjcid" class="form-control" style="width: 150px;">
+									</select>
+								</div>
+							</div>
+							<div class="form-group">
+								<div class="col-sm-8 col-sm-offset-3">
+									<button type="button" class="btn btn-primary" onclick="fsdx();">发送</button>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<!--shiro控制bootstraptable行内按钮看见性 来自bootdo的创新方案 -->
+		<div>
+			<script type="text/javascript">
+				var s_ys_h = 'hidden';
+				var s_fs_h = 'hidden';
+				var s_zs_h = 'hidden';
+				var s_dc_h = 'hidden';
+				var search_index = null;
+			</script>
+		</div>
+		<!-- 
+		<div shiro:hasPermission="proposal:tasc:ys">
+			<script type="text/javascript">
+				s_ys_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:fs">
+			<script type="text/javascript">
+				s_fs_h = '';
+			</script>
+		</div>
+		<div shiro:hasPermission="proposal:tasc:zs">
+			<script type="text/javascript">
+				s_zs_h = '';
+			</script>
+		</div>
+		 -->
+	</div>
+	<div th:include="include :: footer"></div>
+	<script type="text/javascript" src="/js/appjs/proposal/tasc/tays.js?v=2019-01-24"></script>
+</body>
+</html>

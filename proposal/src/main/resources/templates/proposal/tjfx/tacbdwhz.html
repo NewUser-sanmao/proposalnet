@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<meta charset="utf-8">
+<head th:include="include :: header"></head>
+<body class="gray-bg">
+<div class="wrapper wrapper-content ">
+    <div class="col-sm-12">
+        <div class="ibox">
+            <div class="ibox-body">
+                <div class="fixed-table-toolbar">
+                    <div class="columns pull-left">
+                        <!-- <button type="button" class="btn btn-primary" onclick="showSearch();">
+                            <i class="fa fa-search" aria-hidden="true"></i>高级搜索
+                        </button> -->
+                        <select id="zxjcid" class="form-control" style="width: 250px;float:left;">
+                        </select>
+                        <button class="btn btn-success" onclick="reLoad()">查询</button>
+                        <button class="btn btn-success" onclick="dcCbtaml()">导出“承办提案目录”</button>
+                    </div>
+                    <div class="columns pull-right">
+                        <button class="btn btn-primary fa fa-mail-forward asasas" onclick="dc();">导出</button>
+                    </div>
+                    <!--<div class="columns pull-right col-md-2 nopadding">
+                        <input id="searchName" type="text" class="form-control"
+                               placeholder="">
+                    </div>-->
+                </div>
+                <table id="exampleTable" data-mobile-responsive="true">
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div th:include="include :: footer"></div>
+<script type="text/javascript" src="/js/appjs/proposal/tjfx/tacbdwhz.js"></script>
+</body>
+</html>

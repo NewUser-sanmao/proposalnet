@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bootdo.proposal.dao.FhhzDao">
+
+	<select id="get" resultType="com.bootdo.proposal.domain.FhhzDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`type`,`taxxid`,`fsr`,`jsr`,`dz`,`mc` from proposal_fhhz where id = #{value}
+	</select>
+
+	<select id="list" resultType="com.bootdo.proposal.domain.FhhzDO">
+		select `id`,`createId`,`createTime`,`updateId`,`updateTime`,`state`,`type`,`taxxid`,`fsr`,`jsr`,`dz`,`mc` from proposal_fhhz
+        <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxid = #{taxxid} </if>
+		  		  <if test="fsr != null and fsr != ''"> and fsr = #{fsr} </if>
+		  		  <if test="jsr != null and jsr != ''"> and jsr = #{jsr} </if>
+		  		  <if test="dz != null and dz != ''"> and dz = #{dz} </if>
+		  		  <if test="mc != null and mc != ''"> and mc = #{mc} </if>
+		  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="count" resultType="int">
+		select count(*) from proposal_fhhz
+		 <where>  
+		  		  <if test="id != null and id != ''"> and id = #{id} </if>
+		  		  <if test="createid != null and createid != ''"> and createId = #{createid} </if>
+		  		  <if test="createtime != null and createtime != ''"> and createTime = #{createtime} </if>
+		  		  <if test="updateid != null and updateid != ''"> and updateId = #{updateid} </if>
+		  		  <if test="updatetime != null and updatetime != ''"> and updateTime = #{updatetime} </if>
+		  		  <if test="state != null and state != ''"> and state = #{state} </if>
+		  		  <if test="type != null and type != ''"> and type = #{type} </if>
+		  		  <if test="taxxid != null and taxxid != ''"> and taxxid = #{taxxid} </if>
+		  		  <if test="fsr != null and fsr != ''"> and fsr = #{fsr} </if>
+		  		  <if test="jsr != null and jsr != ''"> and jsr = #{jsr} </if>
+		  		  <if test="dz != null and dz != ''"> and dz = #{dz} </if>
+		  		  <if test="mc != null and mc != ''"> and mc = #{mc} </if>
+		  		</where>
+	</select>
+
+	<select id="conuntByTaxxid" resultType="int">
+		select count(distinct createid) from proposal_fhhz
+		<where>
+			1=1
+			<if test="taxxid != null and taxxid != ''"> and taxxid = #{taxxid} </if>
+			<if test="typeid != null and typeid != '' " >and `type` = #{typeid} </if>
+		</where>
+	</select>
+	
+	<select id="listMap" resultType="HashMap">
+		SELECT p1.*,s1.`name` fsrName,s2.`name` jsrName,p2.tatm,p2.lsh,p2.tah,p3.zxjcmc,p4.type fsrType,p5.type jsrType FROM proposal_fhhz p1 
+		LEFT JOIN sys_user s1 on p1.fsr=s1.user_id
+		LEFT JOIN sys_user s2 ON p1.jsr=s2.user_id
+		LEFT JOIN proposal_taxx p2 ON p1.taxxid=p2.id
+		LEFT JOIN proposal_zxjc p3 ON p2.zxjcId=p3.id
+		LEFT JOIN proposal_grwy p4 ON p1.fsr=p4.userId
+		LEFT JOIN proposal_grwy p5 ON p1.jsr=p5.userId
+        <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and p1.createId = #{createid} </if>
+  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+  		  <if test="type != null and type != ''"> and p1.type = #{type} </if>
+  		  <if test="taxxid != null and taxxid != ''"> and p1.taxxid = #{taxxid} </if>
+  		  <if test="fsr != null and fsr != ''"> and p1.fsr = #{fsr} </if>
+  		  <if test="jsr != null and jsr != ''"> and p1.jsr = #{jsr} </if>
+  		  <if test="dz != null and dz != ''"> and p1.dz = #{dz} </if>
+  		  <if test="mc != null and mc != ''"> and p2.tatm like #{mc} </if>
+  		</where>
+        <choose>
+            <when test="sort != null and sort.trim() != ''">
+                order by ${sort} ${order}
+            </when>
+			<otherwise>
+                order by p1.id desc
+			</otherwise>
+        </choose>
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+ 	<select id="countMap" resultType="int">
+		SELECT count(*) FROM proposal_fhhz p1 
+		LEFT JOIN sys_user s1 on p1.fsr=s1.user_id
+		LEFT JOIN sys_user s2 ON p1.jsr=s2.user_id
+		LEFT JOIN proposal_taxx p2 ON p1.taxxid=p2.id
+		LEFT JOIN proposal_zxjc p3 ON p2.zxjcId=p3.id
+		LEFT JOIN proposal_grwy p4 ON p1.fsr=p4.userId
+		LEFT JOIN proposal_grwy p5 ON p1.jsr=p5.userId
+		 <where>  
+  		  <if test="id != null and id != ''"> and p1.id = #{id} </if>
+  		  <if test="createid != null and createid != ''"> and cp1.reateId = #{createid} </if>
+  		  <if test="createtime != null and createtime != ''"> and p1.createTime = #{createtime} </if>
+  		  <if test="updateid != null and updateid != ''"> and p1.updateId = #{updateid} </if>
+  		  <if test="updatetime != null and updatetime != ''"> and p1.updateTime = #{updatetime} </if>
+  		  <if test="state != null and state != ''"> and p1.state = #{state} </if>
+  		  <if test="type != null and type != ''"> and p1.type = #{type} </if>
+  		  <if test="taxxid != null and taxxid != ''"> and p1.taxxid = #{taxxid} </if>
+  		  <if test="fsr != null and fsr != ''"> and p1.fsr = #{fsr} </if>
+  		  <if test="jsr != null and jsr != ''"> and p1.jsr = #{jsr} </if>
+  		  <if test="dz != null and dz != ''"> and p1.dz = #{dz} </if>
+  		  <if test="mc != null and mc != ''"> and p1.mc = #{mc} </if>
+  		</where>
+	</select>
+	 
+	<insert id="save" parameterType="com.bootdo.proposal.domain.FhhzDO" useGeneratedKeys="true" keyProperty="id">
+		insert into proposal_fhhz
+		(
+			`createId`, 
+			`createTime`, 
+			`updateId`, 
+			`updateTime`, 
+			`state`, 
+			`type`, 
+			`taxxid`, 
+			`fsr`, 
+			`jsr`, 
+			`dz`, 
+			`mc`
+		)
+		values
+		(
+			#{createid}, 
+			#{createtime}, 
+			#{updateid}, 
+			#{updatetime}, 
+			#{state}, 
+			#{type}, 
+			#{taxxid}, 
+			#{fsr}, 
+			#{jsr}, 
+			#{dz}, 
+			#{mc}
+		)
+	</insert>
+	 
+	<update id="update" parameterType="com.bootdo.proposal.domain.FhhzDO">
+		update proposal_fhhz 
+		<set>
+			<if test="createid != null">`createId` = #{createid}, </if>
+			<if test="createtime != null">`createTime` = #{createtime}, </if>
+			<if test="updateid != null">`updateId` = #{updateid}, </if>
+			<if test="updatetime != null">`updateTime` = #{updatetime}, </if>
+			<if test="state != null">`state` = #{state}, </if>
+			<if test="type != null">`type` = #{type}, </if>
+			<if test="taxxid != null">`taxxid` = #{taxxid}, </if>
+			<if test="fsr != null">`fsr` = #{fsr}, </if>
+			<if test="jsr != null">`jsr` = #{jsr}, </if>
+			<if test="dz != null">`dz` = #{dz}, </if>
+			<if test="mc != null">`mc` = #{mc}</if>
+		</set>
+		where id = #{id}
+	</update>
+	
+	<delete id="remove">
+		delete from proposal_fhhz where id = #{value}
+	</delete>
+	
+	<delete id="batchRemove">
+		delete from proposal_fhhz where id in 
+		<foreach item="id" collection="array" open="(" separator="," close=")">
+			#{id}
+		</foreach>
+	</delete>
+
+	<select id= "findByFhhz" resultType="Integer">
+		select COUNT(id) from proposal_fhhz where createId = #{createid} and taxxid=#{taxxid}
+	</select>
+
+	<select id="findByName" resultType="Integer">
+		select count(id) from proposal_fhhz p1
+		left join sys_user s1 on p1.createId = s1.user_id
+		where s1.username = #{name} and p1.taxxid = #{taxxid} and p1.type=2
+	</select>
+
+</mapper>
